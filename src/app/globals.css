@@ -25,7 +25,7 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-brand-200;
   }
   body {
     @apply bg-[rgb(var(--background))] text-[rgb(var(--foreground))];
