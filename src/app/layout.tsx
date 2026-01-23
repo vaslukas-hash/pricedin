@@ -2,6 +2,11 @@ import type { Metadata } from 'next'
 import { GeistSans } from 'geist/font/sans'
 import './globals.css'
 
+const geistSans = GeistSans({
+  subsets: ['latin'],
+  variable: '--font-geist-sans',
+})
+
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
   title: {
@@ -47,13 +52,9 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={GeistSans.variable}>
+    <html lang="en" className={geistSans.variable}>
       <body className="min-h-screen bg-brand-50 antialiased">
         {children}
       </body>
