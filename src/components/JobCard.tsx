@@ -1,43 +1,25 @@
-import Link from 'next/link'
-import Image from 'next/image'
+'use client'
+
 import { Job } from '@/lib/db/schema'
 import { formatSalary, timeAgo, cn } from '@/lib/utils'
 
 interface JobCardProps {
   job: Job
   featured?: boolean
+  onClick?: () => void
 }
 
-export function JobCard({ job, featured }: JobCardProps) {
+export function JobCard({ job, featured, onClick }: JobCardProps) {
   return (
-    <Link href={`/jobs/${job.slug}`}>
-      <article 
-        className={cn(
-          "card-hover p-5 flex gap-4 group",
-          featured && "ring-2 ring-accent-200 bg-gradient-to-r from-accent-50/50 to-transparent"
-        )}
-      >
-        {/* Company Logo */}
-        <div className="flex-shrink-0">
-          {job.companyLogoUrl ? (
-            <Image
-              src={job.companyLogoUrl}
-              alt={`${job.companyName} logo`}
-              width={56}
-              height={56}
-              className="w-14 h-14 rounded-lg object-contain bg-white border border-brand-100"
-            />
-          ) : (
-            <div className="w-14 h-14 rounded-lg bg-brand-100 flex items-center justify-center">
-              <span className="text-brand-600 font-semibold text-lg">
-                {job.companyName.charAt(0)}
-              </span>
-            </div>
-          )}
-        </div>
-        
+    <article
+      onClick={onClick}
+      className={cn(
+        "card-hover p-5 group cursor-pointer",
+        featured && "ring-2 ring-accent-200 bg-gradient-to-r from-accent-50/50 to-transparent"
+      )}
+    >
         {/* Content */}
-        <div className="flex-1 min-w-0">
+        <div className="w-full">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               {featured && (
@@ -48,12 +30,12 @@ export function JobCard({ job, featured }: JobCardProps) {
                   Featured
                 </span>
               )}
-              <h3 className="font-semibold text-brand-900 group-hover:text-brand-700 transition-colors truncate">
-                {job.title}
-              </h3>
-              <p className="text-brand-600 text-sm mt-0.5">
+              <p className="text-brand-600 text-sm font-medium mb-1">
                 {job.companyName}
               </p>
+              <h3 className="font-semibold text-lg text-brand-900 group-hover:text-brand-700 transition-colors truncate">
+                {job.title}
+              </h3>
             </div>
             <span className="text-xs text-brand-400 whitespace-nowrap">
               {timeAgo(job.createdAt)}
@@ -83,7 +65,6 @@ export function JobCard({ job, featured }: JobCardProps) {
             </p>
           )}
         </div>
-      </article>
-    </Link>
+    </article>
   )
 }

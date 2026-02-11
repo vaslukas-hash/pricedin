@@ -3,7 +3,7 @@ import { Metadata } from 'next'
 import { db } from '@/lib/db'
 import { jobs } from '@/lib/db/schema'
 import { eq, desc, and, like, or, gte, lte } from 'drizzle-orm'
-import { Header, Footer, JobCard, JobFilters, NewsletterSignup } from '@/components'
+import { Header, Footer, JobFilters, NewsletterSignup, JobsListWithModal } from '@/components'
 
 export const metadata: Metadata = {
   title: 'Browse Jobs',
@@ -114,19 +114,16 @@ export default async function JobsPage({
             </p>
           </div>
           
-          <div className="flex flex-col lg:flex-row gap-8">
-            {/* Sidebar Filters */}
-            <aside className="lg:w-64 flex-shrink-0">
-              <div className="card p-5 sticky top-24">
-                <h2 className="font-semibold text-brand-900 mb-4">Filters</h2>
-                <Suspense fallback={<div>Loading filters...</div>}>
-                  <JobFilters />
-                </Suspense>
-              </div>
-            </aside>
-            
-            {/* Job List */}
-            <div className="flex-1 min-w-0">
+          {/* Filters Above */}
+          <div className="card p-4 mb-6">
+            <Suspense fallback={<div>Loading filters...</div>}>
+              <JobFilters />
+            </Suspense>
+          </div>
+
+          {/* Job List */}
+          <div className="space-y-6">
+            <div>
               {jobsList.length === 0 ? (
                 <div className="card p-8 text-center">
                   <div className="w-16 h-16 rounded-full bg-brand-100 flex items-center justify-center mx-auto mb-4">
@@ -141,18 +138,8 @@ export default async function JobsPage({
                 </div>
               ) : (
                 <>
-                  <div className="space-y-4">
-                    {jobsList.map((job, i) => (
-                      <div 
-                        key={job.id} 
-                        className="animate-slide-in-up"
-                        style={{ animationDelay: `${Math.min(i * 50, 300)}ms` }}
-                      >
-                        <JobCard job={job} featured={job.isFeatured || false} />
-                      </div>
-                    ))}
-                  </div>
-                  
+                  <JobsListWithModal jobs={jobsList} />
+
                   {/* Pagination */}
                   {totalPages > 1 && (
                     <div className="mt-8 flex justify-center gap-2">
@@ -182,10 +169,11 @@ export default async function JobsPage({
                 </>
               )}
               
-              {/* Newsletter */}
-              <div className="mt-12">
-                <NewsletterSignup />
-              </div>
+            </div>
+
+            {/* Newsletter */}
+            <div>
+              <NewsletterSignup />
             </div>
           </div>
         </div>

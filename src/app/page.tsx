@@ -2,28 +2,17 @@ import Link from 'next/link'
 import { db } from '@/lib/db'
 import { jobs } from '@/lib/db/schema'
 import { eq, desc, and, gt } from 'drizzle-orm'
-import { Header, Footer, JobCard, NewsletterSignup } from '@/components'
+import { Header, Footer, JobsListWithModal, NewsletterSignup } from '@/components'
 import { CATEGORIES } from '@/lib/constants'
 
 export const revalidate = 60 // Revalidate every 60 seconds
 
-async function getFeaturedJobs() {
-  return db.select()
-    .from(jobs)
-    .where(and(
-      eq(jobs.status, 'approved'),
-      eq(jobs.isFeatured, true)
-    ))
-    .orderBy(desc(jobs.createdAt))
-    .limit(4)
-}
-
-async function getRecentJobs() {
+async function getAllJobs() {
   return db.select()
     .from(jobs)
     .where(eq(jobs.status, 'approved'))
     .orderBy(desc(jobs.createdAt))
-    .limit(6)
+    .limit(10)
 }
 
 async function getJobCounts() {
@@ -41,9 +30,8 @@ async function getJobCounts() {
 }
 
 export default async function HomePage() {
-  const [featuredJobs, recentJobs, counts] = await Promise.all([
-    getFeaturedJobs(),
-    getRecentJobs(),
+  const [allJobs, counts] = await Promise.all([
+    getAllJobs(),
     getJobCounts(),
   ])
   
@@ -53,7 +41,7 @@ export default async function HomePage() {
       
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="bg-gradient-to-b from-brand-900 via-brand-900 to-brand-800 text-white py-16 sm:py-24">
+        <section className="bg-gradient-to-b from-brand-900 via-brand-900 to-brand-800 text-white py-10 sm:py-14">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <div className="max-w-3xl">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">
@@ -75,42 +63,11 @@ export default async function HomePage() {
                 </Link>
               </div>
             </div>
-            
-            {/* Stats */}
-            <div className="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {CATEGORIES.map(cat => (
-                <div key={cat} className="bg-white/5 rounded-xl p-4 backdrop-blur-sm border border-white/10">
-                  <p className="text-2xl sm:text-3xl font-bold text-white">{counts.byCategory[cat]}</p>
-                  <p className="text-brand-300 text-sm mt-1">{cat}</p>
-                </div>
-              ))}
-            </div>
           </div>
         </section>
         
-        {/* Featured Jobs */}
-        {featuredJobs.length > 0 && (
-          <section className="py-12 sm:py-16">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-brand-900">Featured Jobs</h2>
-                <Link href="/jobs?featured=true" className="text-brand-600 hover:text-brand-800 text-sm font-medium">
-                  View all →
-                </Link>
-              </div>
-              <div className="grid gap-4">
-                {featuredJobs.map((job, i) => (
-                  <div key={job.id} className="animate-slide-in-up" style={{ animationDelay: `${i * 100}ms` }}>
-                    <JobCard job={job} featured />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
-        
-        {/* Recent Jobs */}
-        <section className="py-12 sm:py-16 bg-white">
+        {/* All Jobs */}
+        <section className="py-12 sm:py-16">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-brand-900">Latest Opportunities</h2>
@@ -118,13 +75,7 @@ export default async function HomePage() {
                 View all →
               </Link>
             </div>
-            <div className="grid gap-4">
-              {recentJobs.map((job, i) => (
-                <div key={job.id} className="animate-slide-in-up" style={{ animationDelay: `${i * 75}ms` }}>
-                  <JobCard job={job} />
-                </div>
-              ))}
-            </div>
+            <JobsListWithModal jobs={allJobs} />
             <div className="mt-8 text-center">
               <Link href="/jobs" className="btn-primary btn-lg">
                 Browse All Jobs
@@ -138,25 +89,57 @@ export default async function HomePage() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <h2 className="text-2xl font-bold text-brand-900 mb-6">Browse by Category</h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {CATEGORIES.map(cat => (
-                <Link 
-                  key={cat}
-                  href={`/jobs?category=${encodeURIComponent(cat)}`}
-                  className="card-hover p-6 group"
-                >
-                  <div className="w-12 h-12 rounded-lg bg-brand-100 flex items-center justify-center mb-4 group-hover:bg-brand-200 transition-colors">
-                    <svg className="w-6 h-6 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
-                  </div>
-                  <h3 className="font-semibold text-brand-900 group-hover:text-brand-700 transition-colors">
-                    {cat}
-                  </h3>
-                  <p className="text-brand-500 text-sm mt-1">
-                    {counts.byCategory[cat]} open positions
-                  </p>
-                </Link>
-              ))}
+              {CATEGORIES.map(cat => {
+                // Category-specific icons
+                const getIcon = () => {
+                  switch(cat) {
+                    case 'Pricing':
+                      return (
+                        <svg className="w-6 h-6 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                        </svg>
+                      )
+                    case 'Monetization':
+                      return (
+                        <svg className="w-6 h-6 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      )
+                    case 'Revenue Strategy':
+                      return (
+                        <svg className="w-6 h-6 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                        </svg>
+                      )
+                    case 'Commercial Strategy':
+                      return (
+                        <svg className="w-6 h-6 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                      )
+                    default:
+                      return null
+                  }
+                }
+
+                return (
+                  <Link
+                    key={cat}
+                    href={`/jobs?category=${encodeURIComponent(cat)}`}
+                    className="card-hover p-6 group"
+                  >
+                    <div className="w-12 h-12 rounded-lg bg-brand-100 flex items-center justify-center mb-4 group-hover:bg-brand-200 transition-colors">
+                      {getIcon()}
+                    </div>
+                    <h3 className="font-semibold text-brand-900 group-hover:text-brand-700 transition-colors">
+                      {cat}
+                    </h3>
+                    <p className="text-brand-500 text-sm mt-1">
+                      {counts.byCategory[cat]} open positions
+                    </p>
+                  </Link>
+                )
+              })}
             </div>
           </div>
         </section>

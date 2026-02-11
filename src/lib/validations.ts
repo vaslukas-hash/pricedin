@@ -3,13 +3,18 @@ import { CATEGORIES, SENIORITY_LEVELS, REGIONS, LOCATION_TYPES, CURRENCIES } fro
 
 export const jobFormSchema = z.object({
   companyName: z.string().min(2, 'Company name must be at least 2 characters').max(100),
-  companyWebsite: z.string().url('Invalid URL').optional().or(z.literal('')),
-  companyLogoUrl: z.string().url('Invalid URL').optional().or(z.literal('')),
+  companyWebsite: z.preprocess(
+    (val) => val === '' ? undefined : val,
+    z.string().url('Invalid URL').optional()
+  ),
   title: z.string().min(5, 'Title must be at least 5 characters').max(100),
   description: z.string().min(100, 'Description must be at least 100 characters').max(10000),
   category: z.enum(CATEGORIES),
   seniority: z.enum(SENIORITY_LEVELS),
-  industry: z.string().min(2).max(50).optional().or(z.literal('')),
+  industry: z.preprocess(
+    (val) => val === '' ? undefined : val,
+    z.string().min(2).max(50).optional()
+  ),
   location: z.string().min(2, 'Location is required').max(100),
   locationType: z.enum(LOCATION_TYPES),
   region: z.enum(REGIONS),

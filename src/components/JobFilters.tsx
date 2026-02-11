@@ -34,26 +34,24 @@ export function JobFilters() {
   const hasFilters = searchParams.toString().length > 0
   
   return (
-    <div className="space-y-4">
-      {/* Search */}
+    <div className="space-y-3">
+      {/* Search - Full Width */}
       <div>
-        <label htmlFor="search" className="label">Search</label>
         <input
           type="text"
           id="search"
-          placeholder="Title, company, or keyword..."
-          className="input"
+          placeholder="Search by title, company, or keyword..."
+          className="input text-sm"
           defaultValue={searchParams.get('q') || ''}
           onChange={(e) => updateFilter('q', e.target.value)}
         />
       </div>
-      
-      {/* Category */}
-      <div>
-        <label htmlFor="category" className="label">Category</label>
+
+      {/* Primary Filters - Horizontal Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <select
           id="category"
-          className="select"
+          className="select text-sm py-2"
           value={searchParams.get('category') || ''}
           onChange={(e) => updateFilter('category', e.target.value)}
         >
@@ -62,14 +60,10 @@ export function JobFilters() {
             <option key={cat} value={cat}>{cat}</option>
           ))}
         </select>
-      </div>
-      
-      {/* Seniority */}
-      <div>
-        <label htmlFor="seniority" className="label">Seniority</label>
+
         <select
           id="seniority"
-          className="select"
+          className="select text-sm py-2"
           value={searchParams.get('seniority') || ''}
           onChange={(e) => updateFilter('seniority', e.target.value)}
         >
@@ -78,14 +72,10 @@ export function JobFilters() {
             <option key={level} value={level}>{level}</option>
           ))}
         </select>
-      </div>
-      
-      {/* Location Type */}
-      <div>
-        <label htmlFor="locationType" className="label">Work Type</label>
+
         <select
           id="locationType"
-          className="select"
+          className="select text-sm py-2"
           value={searchParams.get('locationType') || ''}
           onChange={(e) => updateFilter('locationType', e.target.value)}
         >
@@ -94,14 +84,10 @@ export function JobFilters() {
             <option key={type} value={type}>{type}</option>
           ))}
         </select>
-      </div>
-      
-      {/* Region */}
-      <div>
-        <label htmlFor="region" className="label">Region</label>
+
         <select
           id="region"
-          className="select"
+          className="select text-sm py-2"
           value={searchParams.get('region') || ''}
           onChange={(e) => updateFilter('region', e.target.value)}
         >
@@ -111,64 +97,59 @@ export function JobFilters() {
           ))}
         </select>
       </div>
-      
-      {/* Industry */}
-      <div>
-        <label htmlFor="industry" className="label">Industry</label>
-        <select
-          id="industry"
-          className="select"
-          value={searchParams.get('industry') || ''}
-          onChange={(e) => updateFilter('industry', e.target.value)}
-        >
-          <option value="">All Industries</option>
-          {INDUSTRIES.map(ind => (
-            <option key={ind} value={ind}>{ind}</option>
-          ))}
-        </select>
-      </div>
-      
-      {/* Salary Range */}
-      <div>
-        <label htmlFor="salary" className="label">Salary Range</label>
-        <select
-          id="salary"
-          className="select"
-          value={searchParams.get('salary') || ''}
-          onChange={(e) => updateFilter('salary', e.target.value)}
-        >
-          <option value="">Any Salary</option>
-          {SALARY_RANGES.map((range, i) => (
-            <option key={i} value={`${range.min}-${range.max}`}>{range.label}</option>
-          ))}
-        </select>
-      </div>
-      
-      {/* Posted Within */}
-      <div>
-        <label htmlFor="posted" className="label">Posted</label>
-        <select
-          id="posted"
-          className="select"
-          value={searchParams.get('posted') || ''}
-          onChange={(e) => updateFilter('posted', e.target.value)}
-        >
-          <option value="">Any Time</option>
-          {POSTING_AGE_OPTIONS.map(opt => (
-            <option key={opt.days} value={opt.days.toString()}>{opt.label}</option>
-          ))}
-        </select>
-      </div>
-      
-      {/* Clear Filters */}
-      {hasFilters && (
-        <button
-          onClick={clearFilters}
-          className="btn-ghost btn-sm w-full text-brand-500"
-        >
-          Clear all filters
-        </button>
-      )}
+
+      {/* Secondary Filters - Collapsible */}
+      <details className="text-sm">
+        <summary className="cursor-pointer text-brand-600 hover:text-brand-800 font-medium py-1">
+          More filters
+        </summary>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
+          <select
+            id="industry"
+            className="select text-sm py-2"
+            value={searchParams.get('industry') || ''}
+            onChange={(e) => updateFilter('industry', e.target.value)}
+          >
+            <option value="">All Industries</option>
+            {INDUSTRIES.map(ind => (
+              <option key={ind} value={ind}>{ind}</option>
+            ))}
+          </select>
+
+          <select
+            id="salary"
+            className="select text-sm py-2"
+            value={searchParams.get('salary') || ''}
+            onChange={(e) => updateFilter('salary', e.target.value)}
+          >
+            <option value="">Any Salary</option>
+            {SALARY_RANGES.map((range, i) => (
+              <option key={i} value={`${range.min}-${range.max}`}>{range.label}</option>
+            ))}
+          </select>
+
+          <select
+            id="posted"
+            className="select text-sm py-2"
+            value={searchParams.get('posted') || ''}
+            onChange={(e) => updateFilter('posted', e.target.value)}
+          >
+            <option value="">Any Time</option>
+            {POSTING_AGE_OPTIONS.map(opt => (
+              <option key={opt.days} value={opt.days.toString()}>{opt.label}</option>
+            ))}
+          </select>
+
+          {hasFilters && (
+            <button
+              onClick={clearFilters}
+              className="btn-ghost text-sm py-2 text-brand-500 hover:text-brand-700"
+            >
+              Clear filters
+            </button>
+          )}
+        </div>
+      </details>
     </div>
   )
 }

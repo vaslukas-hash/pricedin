@@ -1,7 +1,6 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import Image from 'next/image'
 import { db } from '@/lib/db'
 import { jobs } from '@/lib/db/schema'
 import { eq, and, ne, desc } from 'drizzle-orm'
@@ -91,7 +90,6 @@ function JobPostingJsonLd({ job }: { job: NonNullable<Awaited<ReturnType<typeof 
       '@type': 'Organization',
       name: job.companyName,
       sameAs: job.companyWebsite,
-      logo: job.companyLogoUrl,
     },
     jobLocation: {
       '@type': 'Place',
@@ -199,28 +197,9 @@ export default async function JobPage({ params }: JobPageProps) {
           
           {/* Header */}
           <div className="card p-6 sm:p-8 mb-6">
-            <div className="flex flex-col sm:flex-row gap-6">
-              {/* Logo */}
-              <div className="flex-shrink-0">
-                {job.companyLogoUrl ? (
-                  <Image
-                    src={job.companyLogoUrl}
-                    alt={`${job.companyName} logo`}
-                    width={80}
-                    height={80}
-                    className="w-20 h-20 rounded-xl object-contain bg-white border border-brand-100"
-                  />
-                ) : (
-                  <div className="w-20 h-20 rounded-xl bg-brand-100 flex items-center justify-center">
-                    <span className="text-brand-600 font-bold text-2xl">
-                      {job.companyName.charAt(0)}
-                    </span>
-                  </div>
-                )}
-              </div>
-              
+            <div className="flex flex-col gap-6">
               {/* Info */}
-              <div className="flex-1">
+              <div className="w-full">
                 {job.isFeatured && (
                   <span className="featured-badge mb-3">
                     <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">

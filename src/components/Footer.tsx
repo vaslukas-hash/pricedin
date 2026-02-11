@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 export function Footer() {
   return (
-    <footer className="bg-brand-900 text-brand-200 mt-auto">
+    <footer className="bg-brand-800 text-brand-200 mt-auto">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
@@ -63,7 +63,7 @@ export function Footer() {
           </div>
         </div>
         
-        <div className="border-t border-brand-800 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="border-t border-brand-700 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-brand-400 text-sm">
             © {new Date().getFullYear()} PricedIn. All rights reserved.
           </p>

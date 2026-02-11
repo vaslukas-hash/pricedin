@@ -15,7 +15,6 @@ sqlite.exec(`
     status TEXT DEFAULT 'pending' NOT NULL,
     company_name TEXT NOT NULL,
     company_website TEXT,
-    company_logo_url TEXT,
     title TEXT NOT NULL,
     description TEXT NOT NULL,
     category TEXT NOT NULL,
@@ -58,7 +57,6 @@ const seedJobs = [
     status: 'approved',
     companyName: 'Spotify',
     companyWebsite: 'https://spotify.com',
-    companyLogoUrl: 'https://logo.clearbit.com/spotify.com',
     title: 'Pricing Manager',
     description: `## About the Role
 
@@ -109,7 +107,6 @@ We're looking for a Pricing Manager to join our Global Pricing team in Stockholm
     status: 'approved',
     companyName: 'Stripe',
     companyWebsite: 'https://stripe.com',
-    companyLogoUrl: 'https://logo.clearbit.com/stripe.com',
     title: 'Monetization Lead',
     description: `## The Opportunity
 
@@ -161,7 +158,6 @@ Stripe is building the economic infrastructure for the internet. As our Monetiza
     status: 'approved',
     companyName: 'Netflix',
     companyWebsite: 'https://netflix.com',
-    companyLogoUrl: 'https://logo.clearbit.com/netflix.com',
     title: 'Director, Revenue Strategy',
     description: `## About Netflix
 
@@ -213,7 +209,6 @@ We believe in freedom and responsibility. You'll have the autonomy to make impac
     status: 'approved',
     companyName: 'Wise',
     companyWebsite: 'https://wise.com',
-    companyLogoUrl: 'https://logo.clearbit.com/wise.com',
     title: 'Commercial Strategy Analyst',
     description: `## Our Mission
 
@@ -269,7 +264,6 @@ Join our Commercial Strategy team to help Wise grow sustainably while keeping ou
     status: 'approved',
     companyName: 'Shopify',
     companyWebsite: 'https://shopify.com',
-    companyLogoUrl: 'https://logo.clearbit.com/shopify.com',
     title: 'Pricing Operations Manager',
     description: `## About Shopify
 
@@ -321,7 +315,6 @@ Shopify powers millions of businesses worldwide. We're looking for a Pricing Ope
     status: 'approved',
     companyName: 'Klarna',
     companyWebsite: 'https://klarna.com',
-    companyLogoUrl: 'https://logo.clearbit.com/klarna.com',
     title: 'VP of Pricing',
     description: `## Shape the Future of Shopping
 
@@ -376,7 +369,6 @@ Lead a team of pricing professionals to optimize Klarna's pricing across merchan
     status: 'approved',
     companyName: 'Revolut',
     companyWebsite: 'https://revolut.com',
-    companyLogoUrl: 'https://logo.clearbit.com/revolut.com',
     title: 'Senior Pricing Analyst',
     description: `## Get Ready to Revolutionize Finance
 
@@ -428,7 +420,6 @@ Revolut is building the world's first truly global financial super app. Join our
     status: 'approved',
     companyName: 'Booking.com',
     companyWebsite: 'https://booking.com',
-    companyLogoUrl: 'https://logo.clearbit.com/booking.com',
     title: 'Head of Revenue Strategy',
     description: `## Connect People with Incredible Experiences
 
@@ -484,7 +475,6 @@ Lead revenue strategy across our accommodation, flights, and experiences vertica
     status: 'approved',
     companyName: 'Delivery Hero',
     companyWebsite: 'https://deliveryhero.com',
-    companyLogoUrl: 'https://logo.clearbit.com/deliveryhero.com',
     title: 'Monetization Manager',
     description: `## Delivering Amazing Experiences
 
@@ -540,7 +530,6 @@ Own monetization strategy for one of our key markets or product verticals. You'l
     status: 'approved',
     companyName: 'N26',
     companyWebsite: 'https://n26.com',
-    companyLogoUrl: 'https://logo.clearbit.com/n26.com',
     title: 'Commercial Strategy Lead',
     description: `## Banking, Redesigned
 
@@ -593,6 +582,9 @@ Lead strategic initiatives that shape N26's commercial success across European m
   },
 ]
 
+// Clear existing data
+sqlite.exec('DELETE FROM jobs;')
+
 // Insert seed data
 console.log('🌱 Seeding database...')
 
@@ -602,7 +594,6 @@ for (const job of seedJobs) {
     status: job.status as 'pending' | 'approved' | 'rejected' | 'expired',
     companyName: job.companyName,
     companyWebsite: job.companyWebsite,
-    companyLogoUrl: job.companyLogoUrl,
     title: job.title,
     description: job.description,
     category: job.category as 'Pricing' | 'Monetization' | 'Revenue Strategy' | 'Commercial Strategy',

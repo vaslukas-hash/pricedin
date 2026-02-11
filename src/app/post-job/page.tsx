@@ -10,7 +10,6 @@ import { formatSalary } from '@/lib/utils'
 interface FormData {
   companyName: string
   companyWebsite: string
-  companyLogoUrl: string
   title: string
   description: string
   category: string
@@ -29,7 +28,6 @@ interface FormData {
 const initialFormData: FormData = {
   companyName: '',
   companyWebsite: '',
-  companyLogoUrl: '',
   title: '',
   description: '',
   category: '',
@@ -79,9 +77,6 @@ export default function PostJobPage() {
     // URL validation
     if (formData.companyWebsite && !isValidUrl(formData.companyWebsite)) {
       newErrors.companyWebsite = 'Invalid URL'
-    }
-    if (formData.companyLogoUrl && !isValidUrl(formData.companyLogoUrl)) {
-      newErrors.companyLogoUrl = 'Invalid URL'
     }
     if (formData.applyUrl && !isValidUrl(formData.applyUrl)) {
       newErrors.applyUrl = 'Invalid URL'
@@ -172,24 +167,9 @@ export default function PostJobPage() {
             </div>
             
             <div className="card p-6 sm:p-8 mb-6">
-              <div className="flex items-start gap-4 mb-6">
-                {formData.companyLogoUrl ? (
-                  <img
-                    src={formData.companyLogoUrl}
-                    alt={formData.companyName}
-                    className="w-16 h-16 rounded-lg object-contain bg-white border border-brand-100"
-                  />
-                ) : (
-                  <div className="w-16 h-16 rounded-lg bg-brand-100 flex items-center justify-center">
-                    <span className="text-brand-600 font-bold text-xl">
-                      {formData.companyName.charAt(0)}
-                    </span>
-                  </div>
-                )}
-                <div>
-                  <h1 className="text-2xl font-bold text-brand-900">{formData.title}</h1>
-                  <p className="text-brand-600">{formData.companyName}</p>
-                </div>
+              <div className="mb-6">
+                <p className="text-brand-600 mb-1">{formData.companyName}</p>
+                <h1 className="text-2xl font-bold text-brand-900">{formData.title}</h1>
               </div>
               
               <div className="flex flex-wrap gap-2 mb-4">
@@ -296,21 +276,6 @@ export default function PostJobPage() {
                     placeholder="https://company.com"
                   />
                   {errors.companyWebsite && <p className="text-red-500 text-sm mt-1">{errors.companyWebsite}</p>}
-                </div>
-                
-                <div>
-                  <label htmlFor="companyLogoUrl" className="label">Company Logo URL</label>
-                  <input
-                    type="url"
-                    id="companyLogoUrl"
-                    name="companyLogoUrl"
-                    value={formData.companyLogoUrl}
-                    onChange={handleChange}
-                    className={`input ${errors.companyLogoUrl ? 'border-red-500' : ''}`}
-                    placeholder="https://company.com/logo.png"
-                  />
-                  <p className="text-brand-500 text-sm mt-1">Tip: Use clearbit.com/logo for company logos</p>
-                  {errors.companyLogoUrl && <p className="text-red-500 text-sm mt-1">{errors.companyLogoUrl}</p>}
                 </div>
               </div>
             </div>

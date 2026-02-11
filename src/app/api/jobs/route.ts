@@ -62,7 +62,6 @@ export async function POST(request: NextRequest) {
       status: 'pending',
       companyName: data.companyName,
       companyWebsite: data.companyWebsite || null,
-      companyLogoUrl: data.companyLogoUrl || null,
       title: data.title,
       description: sanitizedDescription,
       category: data.category,

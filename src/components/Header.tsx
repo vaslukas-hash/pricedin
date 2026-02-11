@@ -13,7 +13,7 @@ export function Header() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-800 to-brand-900 flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
+            <div className="w-8 h-8 rounded-lg bg-accent-500 flex items-center justify-center group-hover:bg-accent-600 transition-colors">
               <span className="text-white font-bold text-sm">P</span>
             </div>
             <span className="font-semibold text-brand-900 text-lg">

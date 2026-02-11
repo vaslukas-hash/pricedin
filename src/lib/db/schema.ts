@@ -8,7 +8,6 @@ export const jobs = sqliteTable('jobs', {
   // Company info
   companyName: text('company_name').notNull(),
   companyWebsite: text('company_website'),
-  companyLogoUrl: text('company_logo_url'),
   
   // Job details
   title: text('title').notNull(),
