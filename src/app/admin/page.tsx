@@ -15,6 +15,12 @@ export default function AdminPage() {
   const [jobs, setJobs] = useState<Job[]>([])
   const [status, setStatus] = useState<'pending' | 'approved' | 'rejected' | 'expired'>('pending')
   const [stats, setStats] = useState({ pending: 0, approved: 0, rejected: 0, expired: 0 })
+  const [uploadResult, setUploadResult] = useState<{
+    total: number; success: number; failed: number;
+    results: { row: number; status: string; slug?: string; errors?: Record<string, string[]> }[]
+  } | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState('')
   
   const fetchJobs = async (statusFilter: string) => {
     try {
@@ -124,6 +130,49 @@ export default function AdminPage() {
     }
   }
   
+  const handleDownloadTemplate = () => {
+    window.location.href = '/api/admin/jobs/template'
+  }
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploading(true)
+    setUploadError('')
+    setUploadResult(null)
+
+    const formData = new FormData()
+    formData.append('file', file)
+
+    try {
+      const res = await fetch('/api/admin/jobs/upload', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (res.status === 401) {
+        setIsAuthenticated(false)
+        return
+      }
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setUploadError(data.error || 'Upload failed')
+      } else {
+        setUploadResult(data)
+        fetchJobs(status)
+        fetchStats()
+      }
+    } catch {
+      setUploadError('Upload failed. Please try again.')
+    } finally {
+      setUploading(false)
+      e.target.value = ''
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-brand-50">
@@ -216,7 +265,65 @@ export default function AdminPage() {
             <p className="text-brand-600 text-sm">Expired</p>
           </div>
         </div>
-        
+
+        {/* Bulk Upload Section */}
+        <div className="card p-5 mb-8">
+          <h3 className="font-semibold text-brand-900 mb-3">Bulk Upload Jobs</h3>
+          <p className="text-brand-600 text-sm mb-4">
+            Upload an Excel file to create multiple jobs at once. Jobs will be auto-approved.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <button onClick={handleDownloadTemplate} className="btn-outline btn-sm">
+              Download Template
+            </button>
+            <label className={`btn-primary btn-sm cursor-pointer ${uploading ? 'opacity-50' : ''}`}>
+              {uploading ? 'Uploading...' : 'Upload Excel File'}
+              <input
+                type="file"
+                accept=".xlsx,.xls"
+                onChange={handleFileUpload}
+                disabled={uploading}
+                className="hidden"
+              />
+            </label>
+          </div>
+
+          {uploadError && (
+            <div className="mt-4 p-3 bg-red-50 rounded-lg text-red-700 text-sm">
+              {uploadError}
+            </div>
+          )}
+
+          {uploadResult && (
+            <div className="mt-4">
+              <div className="p-3 bg-brand-50 rounded-lg mb-3">
+                <p className="text-sm font-medium text-brand-900">
+                  Upload Complete: {uploadResult.success} of {uploadResult.total} jobs created
+                  {uploadResult.failed > 0 && (
+                    <span className="text-red-600"> ({uploadResult.failed} failed)</span>
+                  )}
+                </p>
+              </div>
+
+              {uploadResult.results.filter(r => r.status === 'error').length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-red-600">Errors:</p>
+                  {uploadResult.results
+                    .filter(r => r.status === 'error')
+                    .map((r, idx) => (
+                      <div key={idx} className="p-2 bg-red-50 rounded text-xs text-red-700">
+                        <strong>Row {r.row}:</strong>{' '}
+                        {Object.entries(r.errors || {}).map(([field, msgs]) =>
+                          `${field}: ${(msgs as string[]).join(', ')}`
+                        ).join(' | ')}
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
         {/* Tabs */}
         <div className="flex gap-2 mb-6 overflow-x-auto">
           {(['pending', 'approved', 'rejected', 'expired'] as const).map(s => (
@@ -249,19 +356,11 @@ export default function AdminPage() {
                 <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start gap-3">
-                      {job.companyLogoUrl ? (
-                        <img
-                          src={job.companyLogoUrl}
-                          alt={job.companyName}
-                          className="w-12 h-12 rounded-lg object-contain bg-white border border-brand-100"
-                        />
-                      ) : (
-                        <div className="w-12 h-12 rounded-lg bg-brand-100 flex items-center justify-center flex-shrink-0">
-                          <span className="text-brand-600 font-semibold">
-                            {job.companyName.charAt(0)}
-                          </span>
-                        </div>
-                      )}
+                      <div className="w-12 h-12 rounded-lg bg-brand-100 flex items-center justify-center flex-shrink-0">
+                        <span className="text-brand-600 font-semibold">
+                          {job.companyName.charAt(0)}
+                        </span>
+                      </div>
                       <div className="min-w-0">
                         <h3 className="font-semibold text-brand-900 truncate">{job.title}</h3>
                         <p className="text-brand-600 text-sm">{job.companyName}</p>

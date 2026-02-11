@@ -9,29 +9,8 @@ interface JobsListWithModalProps {
   jobs: Job[]
 }
 
-interface JobWithDetails extends Job {
-  id: number
-  slug: string
-  companyName: string
-  companyWebsite: string | null
-  title: string
-  description: string
-  category: string
-  seniority: string
-  industry: string | null
-  location: string
-  locationType: string
-  region: string
-  salaryMin: number | null
-  salaryMax: number | null
-  salaryCurrency: string | null
-  applyUrl: string
-  isFeatured: boolean
-  createdAt: string
-}
-
 export function JobsListWithModal({ jobs }: JobsListWithModalProps) {
-  const [selectedJob, setSelectedJob] = useState<JobWithDetails | null>(null)
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -45,7 +24,7 @@ export function JobsListWithModal({ jobs }: JobsListWithModalProps) {
       if (!response.ok) throw new Error('Failed to fetch job details')
 
       const jobDetails = await response.json()
-      setSelectedJob(jobDetails as JobWithDetails)
+      setSelectedJob(jobDetails as Job)
     } catch (error) {
       console.error('Error fetching job details:', error)
       setIsModalOpen(false)

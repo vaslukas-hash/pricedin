@@ -37,10 +37,10 @@ export function NewsletterSignup() {
   return (
     <div className="bg-brand-900 rounded-2xl p-6 sm:p-8">
       <h3 className="text-xl font-semibold text-white mb-2">
-        Get new jobs in your inbox
+        Never miss a pricing job
       </h3>
       <p className="text-brand-300 text-sm mb-4">
-        Weekly digest of the best pricing and revenue strategy roles.
+        Join hundreds of pricing professionals. Get the best pricing, monetization, and revenue strategy jobs delivered weekly.
       </p>
       
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">

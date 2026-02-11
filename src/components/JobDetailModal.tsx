@@ -2,27 +2,7 @@
 
 import { Modal } from './Modal'
 import { formatSalary, timeAgo, sanitizeHtml } from '@/lib/utils'
-
-interface Job {
-  id: number
-  slug: string
-  companyName: string
-  companyWebsite: string | null
-  title: string
-  description: string
-  category: string
-  seniority: string
-  industry: string | null
-  location: string
-  locationType: string
-  region: string
-  salaryMin: number | null
-  salaryMax: number | null
-  salaryCurrency: string | null
-  applyUrl: string
-  isFeatured: boolean
-  createdAt: string
-}
+import type { Job } from '@/lib/db/schema'
 
 interface JobDetailModalProps {
   job: Job | null
@@ -160,9 +140,9 @@ export function JobDetailModal({ job, isOpen, onClose }: JobDetailModalProps) {
 
         {/* Bottom CTA */}
         <div className="pt-6 border-t border-brand-100 bg-gradient-to-r from-brand-50 to-brand-100/50 -mx-6 -mb-6 sm:-mx-8 sm:-mb-8 px-6 sm:px-8 py-6 rounded-b-2xl">
-          <h3 className="text-lg font-semibold text-brand-900 mb-2">Ready to apply?</h3>
+          <h3 className="text-lg font-semibold text-brand-900 mb-2">Interested in this role?</h3>
           <p className="text-brand-600 mb-4">
-            Click below to apply directly on {job.companyName}'s website.
+            Apply now on {job.companyName}&apos;s website. Great pricing roles fill fast.
           </p>
           <ApplyButton job={job} />
         </div>

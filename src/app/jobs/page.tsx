@@ -6,8 +6,8 @@ import { eq, desc, and, like, or, gte, lte } from 'drizzle-orm'
 import { Header, Footer, JobFilters, NewsletterSignup, JobsListWithModal } from '@/components'
 
 export const metadata: Metadata = {
-  title: 'Browse Jobs',
-  description: 'Find pricing, monetization, revenue strategy, and commercial strategy jobs at top companies.',
+  title: 'Browse Pricing Jobs & Revenue Strategy Careers',
+  description: 'Search and filter pricing jobs, monetization careers, and revenue strategy roles. Updated daily with new opportunities from leading employers.',
 }
 
 export const revalidate = 60
@@ -108,9 +108,9 @@ export default async function JobsPage({
       <main className="flex-1 py-8">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-brand-900">Browse Jobs</h1>
+            <h1 className="text-3xl font-bold text-brand-900">Pricing & Revenue Strategy Jobs</h1>
             <p className="text-brand-600 mt-2">
-              {total} {total === 1 ? 'position' : 'positions'} available
+              {total} open {total === 1 ? 'role' : 'roles'} from top employers
             </p>
           </div>
           

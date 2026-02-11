@@ -32,7 +32,7 @@ export function Header() {
                   : "text-brand-600 hover:text-brand-900 hover:bg-brand-50"
               )}
             >
-              Browse Jobs
+              Pricing Jobs
             </Link>
             <Link 
               href="/post-job" 

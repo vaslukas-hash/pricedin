@@ -5,18 +5,24 @@ import './globals.css'
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
   title: {
-    default: 'PricedIn | Pricing & Revenue Strategy Jobs',
+    default: 'PricedIn | Pricing Jobs, Monetization Careers & Revenue Strategy Roles',
     template: '%s | PricedIn',
   },
   description:
-    'The job board for pricing, monetization, revenue strategy, and commercial strategy professionals. Find your next role at top companies.',
+    'The #1 job board for pricing jobs, monetization careers, and revenue strategy roles. Browse curated opportunities from top employers hiring pricing analysts, managers, and directors.',
   keywords: [
     'pricing jobs',
+    'pricing manager jobs',
+    'pricing analyst jobs',
+    'monetization careers',
     'monetization jobs',
-    'revenue strategy',
-    'commercial strategy',
-    'pricing manager',
-    'pricing analyst',
+    'revenue strategy jobs',
+    'revenue strategy careers',
+    'commercial strategy jobs',
+    'pricing director jobs',
+    'head of pricing',
+    'VP pricing',
+    'pricing salary',
   ],
   authors: [{ name: 'PricedIn' }],
   creator: 'PricedIn',
@@ -25,23 +31,23 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: '/',
     siteName: 'PricedIn',
-    title: 'PricedIn | Pricing & Revenue Strategy Jobs',
+    title: 'PricedIn | Pricing Jobs, Monetization Careers & Revenue Strategy Roles',
     description:
-      'The job board for pricing, monetization, revenue strategy, and commercial strategy professionals.',
+      'The #1 job board for pricing professionals. Browse pricing jobs, monetization careers, and revenue strategy roles at top companies.',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'PricedIn - Pricing & Revenue Strategy Jobs',
+        alt: 'PricedIn - Pricing Jobs, Monetization Careers & Revenue Strategy Roles',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'PricedIn | Pricing & Revenue Strategy Jobs',
+    title: 'PricedIn | Pricing Jobs, Monetization Careers & Revenue Strategy Roles',
     description:
-      'The job board for pricing, monetization, revenue strategy, and commercial strategy professionals.',
+      'The #1 job board for pricing professionals. Browse pricing jobs, monetization careers, and revenue strategy roles at top companies.',
     images: ['/og-image.png'],
   },
   robots: {

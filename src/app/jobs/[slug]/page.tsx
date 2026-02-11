@@ -57,7 +57,7 @@ export async function generateMetadata({ params }: JobPageProps): Promise<Metada
   
   return {
     title: `${job.title} at ${job.companyName}`,
-    description: `${job.title} position at ${job.companyName}. ${job.locationType} in ${job.location}. ${salary !== 'Competitive' ? salary : ''}`,
+    description: `${job.title} at ${job.companyName} — ${job.locationType} ${job.category.toLowerCase()} job in ${job.location}. ${salary !== 'Competitive' ? 'Salary: ' + salary + '.' : ''} Apply now on PricedIn.`,
     openGraph: {
       title: `${job.title} at ${job.companyName}`,
       description: `${job.locationType} · ${job.location} · ${job.category}`,
@@ -289,9 +289,9 @@ export default async function JobPage({ params }: JobPageProps) {
           
           {/* Apply CTA */}
           <div className="card p-6 sm:p-8 bg-gradient-to-r from-brand-50 to-brand-100/50 mb-8">
-            <h3 className="text-lg font-semibold text-brand-900 mb-2">Ready to apply?</h3>
+            <h3 className="text-lg font-semibold text-brand-900 mb-2">Interested in this role?</h3>
             <p className="text-brand-600 mb-4">
-              Click below to apply directly on {job.companyName}'s website.
+              Apply now on {job.companyName}&apos;s website. Great pricing roles fill fast.
             </p>
             <ApplyButton job={job} />
           </div>

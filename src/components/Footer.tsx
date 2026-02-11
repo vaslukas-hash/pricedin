@@ -16,7 +16,7 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-brand-300 text-sm leading-relaxed max-w-sm">
-              The niche job board for pricing, monetization, revenue strategy, and commercial strategy professionals.
+              The #1 job board for pricing jobs, monetization careers, and revenue strategy roles. Connecting pricing professionals with top employers.
             </p>
           </div>
           

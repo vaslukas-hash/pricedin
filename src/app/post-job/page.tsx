@@ -241,7 +241,7 @@ export default function PostJobPage() {
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-brand-900">Post a Job</h1>
             <p className="text-brand-600 mt-2">
-              Reach thousands of pricing and revenue strategy professionals.
+              Reach thousands of pricing analysts, managers, and strategists actively looking for their next role.
             </p>
           </div>
           

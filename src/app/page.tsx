@@ -45,15 +45,15 @@ export default async function HomePage() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <div className="max-w-3xl">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">
-                Where pricing careers
-                <span className="text-accent-400"> take off</span>
+                Find your next
+                <span className="text-accent-400"> pricing job</span>
               </h1>
               <p className="mt-6 text-lg sm:text-xl text-brand-200 leading-relaxed">
-                The niche job board for pricing, monetization, revenue strategy, and commercial strategy professionals. Find your next role at industry-leading companies.
+                The dedicated job board for pricing, monetization, and revenue strategy professionals. Curated roles from companies that value pricing expertise.
               </p>
               <div className="mt-8 flex flex-col sm:flex-row gap-4">
                 <Link href="/jobs" className="btn-accent btn-lg">
-                  Browse {counts.total} Jobs
+                  Explore {counts.total} Pricing Jobs
                   <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
@@ -70,7 +70,7 @@ export default async function HomePage() {
         <section className="py-12 sm:py-16">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-brand-900">Latest Opportunities</h2>
+              <h2 className="text-2xl font-bold text-brand-900">Latest Pricing & Revenue Strategy Jobs</h2>
               <Link href="/jobs" className="text-brand-600 hover:text-brand-800 text-sm font-medium">
                 View all →
               </Link>
@@ -78,7 +78,7 @@ export default async function HomePage() {
             <JobsListWithModal jobs={allJobs} />
             <div className="mt-8 text-center">
               <Link href="/jobs" className="btn-primary btn-lg">
-                Browse All Jobs
+                View All Open Positions
               </Link>
             </div>
           </div>
@@ -87,7 +87,7 @@ export default async function HomePage() {
         {/* Categories */}
         <section className="py-12 sm:py-16">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
-            <h2 className="text-2xl font-bold text-brand-900 mb-6">Browse by Category</h2>
+            <h2 className="text-2xl font-bold text-brand-900 mb-6">Explore Pricing Jobs by Specialty</h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {CATEGORIES.map(cat => {
                 // Category-specific icons
@@ -135,7 +135,7 @@ export default async function HomePage() {
                       {cat}
                     </h3>
                     <p className="text-brand-500 text-sm mt-1">
-                      {counts.byCategory[cat]} open positions
+                      {counts.byCategory[cat]} open {cat.toLowerCase()} jobs
                     </p>
                   </Link>
                 )
@@ -156,13 +156,13 @@ export default async function HomePage() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <div className="bg-gradient-to-br from-brand-800 to-brand-900 rounded-2xl p-8 sm:p-12 text-center">
               <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
-                Hiring for pricing or revenue roles?
+                Hire top pricing and revenue strategy talent
               </h2>
               <p className="text-brand-200 mb-8 max-w-xl mx-auto">
-                Reach thousands of specialized pricing and revenue strategy professionals. Post your job for free during our beta period.
+                Get your pricing job in front of thousands of qualified pricing analysts, managers, and strategists. Free during our launch period — limited time.
               </p>
               <Link href="/post-job" className="btn-accent btn-lg">
-                Post a Job — Free
+                Post a Job Free Today
               </Link>
             </div>
           </div>
