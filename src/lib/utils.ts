@@ -3,7 +3,7 @@ import { CURRENCIES } from './constants'
 
 export function generateSlug(companyName: string, title: string): string {
   const base = slugify(`${companyName} ${title}`, { lower: true, strict: true })
-  const random = Math.random().toString(36).substring(2, 6)
+  const random = Math.random().toString(36).substring(2, 10)
   return `${base}-${random}`
 }
 

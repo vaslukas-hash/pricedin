@@ -102,42 +102,60 @@ export async function POST(request: NextRequest) {
       const data = parseResult.data
 
       try {
-        const slug = generateSlug(data.companyName, data.title)
         const sanitizedDescription = sanitizeHtml(data.description)
+        let slug = ''
+        let inserted = false
 
-        await db.insert(jobs).values({
-          slug,
-          status: 'approved',
-          companyName: data.companyName,
-          companyWebsite: data.companyWebsite || null,
-          title: data.title,
-          description: sanitizedDescription,
-          category: data.category,
-          seniority: data.seniority,
-          industry: data.industry || null,
-          location: data.location,
-          locationType: data.locationType,
-          region: data.region,
-          salaryMin: data.salaryMin || null,
-          salaryMax: data.salaryMax || null,
-          salaryCurrency: data.salaryCurrency,
-          applyUrl: data.applyUrl,
-          contactEmail: data.contactEmail,
-          isFeatured: false,
-          views: 0,
-          clicks: 0,
-          createdAt: new Date().toISOString(),
-          approvedAt: new Date().toISOString(),
-          expiresAt: getExpirationDate(),
-        })
+        for (let attempt = 0; attempt < 3; attempt++) {
+          slug = generateSlug(data.companyName, data.title)
+          try {
+            await db.insert(jobs).values({
+              slug,
+              status: 'approved',
+              companyName: data.companyName,
+              companyWebsite: data.companyWebsite || null,
+              title: data.title,
+              description: sanitizedDescription,
+              category: data.category,
+              seniority: data.seniority,
+              industry: data.industry || null,
+              location: data.location || '',
+              locationType: data.locationType,
+              region: data.region,
+              salaryMin: data.salaryMin || null,
+              salaryMax: data.salaryMax || null,
+              salaryCurrency: data.salaryCurrency,
+              applyUrl: data.applyUrl,
+              contactEmail: data.contactEmail || '',
+              isFeatured: false,
+              views: 0,
+              clicks: 0,
+              createdAt: new Date().toISOString(),
+              approvedAt: new Date().toISOString(),
+              expiresAt: getExpirationDate(),
+            })
+            inserted = true
+            break
+          } catch {
+            // Retry with a new slug
+          }
+        }
 
-        results.push({ row: rowNum, status: 'success', slug })
-        successCount++
+        if (inserted) {
+          results.push({ row: rowNum, status: 'success', slug })
+          successCount++
+        } else {
+          results.push({
+            row: rowNum,
+            status: 'error',
+            errors: { _db: ['Database insert failed after retries.'] },
+          })
+        }
       } catch {
         results.push({
           row: rowNum,
           status: 'error',
-          errors: { _db: ['Database insert failed. Possible duplicate slug.'] },
+          errors: { _db: ['Database insert failed.'] },
         })
       }
     }

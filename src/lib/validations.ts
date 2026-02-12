@@ -15,14 +15,20 @@ export const jobFormSchema = z.object({
     (val) => val === '' ? undefined : val,
     z.string().min(2).max(50).optional()
   ),
-  location: z.string().min(2, 'Location is required').max(100),
+  location: z.preprocess(
+    (val) => val === '' ? undefined : val,
+    z.string().min(2).max(100).optional()
+  ),
   locationType: z.enum(LOCATION_TYPES),
   region: z.enum(REGIONS),
   salaryMin: z.number().int().min(0).optional(),
   salaryMax: z.number().int().min(0).optional(),
   salaryCurrency: z.enum(CURRENCIES.map(c => c.code) as [string, ...string[]]).default('EUR'),
   applyUrl: z.string().url('Invalid apply URL'),
-  contactEmail: z.string().email('Invalid email'),
+  contactEmail: z.preprocess(
+    (val) => val === '' ? undefined : val,
+    z.string().email('Invalid email').optional()
+  ),
 }).refine(data => {
   if (data.salaryMin && data.salaryMax) {
     return data.salaryMin <= data.salaryMax

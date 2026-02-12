@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { jobs } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
-import { getExpirationDate } from '@/lib/utils'
+import { generateSlug, getExpirationDate, sanitizeHtml } from '@/lib/utils'
+import { jobFormSchema } from '@/lib/validations'
 import { cookies } from 'next/headers'
 
 function isAuthenticated(request: NextRequest): boolean {
@@ -29,6 +30,60 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Error fetching jobs:', error)
     return NextResponse.json({ error: 'Failed to fetch jobs' }, { status: 500 })
+  }
+}
+
+export async function POST(request: NextRequest) {
+  if (!isAuthenticated(request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  try {
+    const body = await request.json()
+    const parsed = jobFormSchema.safeParse(body)
+
+    if (!parsed.success) {
+      const fieldErrors: Record<string, string[]> = {}
+      for (const issue of parsed.error.issues) {
+        const key = issue.path.join('.')
+        if (!fieldErrors[key]) fieldErrors[key] = []
+        fieldErrors[key].push(issue.message)
+      }
+      return NextResponse.json({ error: 'Validation failed', fieldErrors }, { status: 400 })
+    }
+
+    const data = parsed.data
+    const slug = generateSlug(data.companyName, data.title)
+    const now = new Date().toISOString()
+
+    await db.insert(jobs).values({
+      slug,
+      status: 'approved',
+      companyName: data.companyName,
+      companyWebsite: data.companyWebsite || null,
+      title: data.title,
+      description: sanitizeHtml(data.description),
+      category: data.category,
+      seniority: data.seniority,
+      industry: data.industry || null,
+      location: data.location || '',
+      locationType: data.locationType,
+      region: data.region,
+      salaryMin: data.salaryMin || null,
+      salaryMax: data.salaryMax || null,
+      salaryCurrency: data.salaryCurrency || 'EUR',
+      applyUrl: data.applyUrl,
+      contactEmail: data.contactEmail || '',
+      isFeatured: false,
+      createdAt: now,
+      approvedAt: now,
+      expiresAt: getExpirationDate(),
+    })
+
+    return NextResponse.json({ success: true, slug })
+  } catch (error) {
+    console.error('Error creating job:', error)
+    return NextResponse.json({ error: 'Failed to create job' }, { status: 500 })
   }
 }
 

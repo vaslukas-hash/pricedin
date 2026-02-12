@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Job } from '@/lib/db/schema'
 import { formatSalary, timeAgo } from '@/lib/utils'
+import { CATEGORIES, SENIORITY_LEVELS, REGIONS, LOCATION_TYPES, CURRENCIES, INDUSTRIES } from '@/lib/constants'
 
 export default function AdminPage() {
   const router = useRouter()
@@ -21,6 +22,17 @@ export default function AdminPage() {
   } | null>(null)
   const [uploading, setUploading] = useState(false)
   const [uploadError, setUploadError] = useState('')
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [addFormData, setAddFormData] = useState({
+    companyName: '', companyWebsite: '', title: '', description: '',
+    category: CATEGORIES[0] as string, seniority: SENIORITY_LEVELS[0] as string,
+    industry: '', location: '', locationType: LOCATION_TYPES[0] as string,
+    region: REGIONS[0] as string, salaryMin: '', salaryMax: '',
+    salaryCurrency: 'EUR', applyUrl: '', contactEmail: '',
+  })
+  const [addErrors, setAddErrors] = useState<Record<string, string[]>>({})
+  const [addSubmitting, setAddSubmitting] = useState(false)
+  const [addSuccess, setAddSuccess] = useState('')
   
   const fetchJobs = async (statusFilter: string) => {
     try {
@@ -173,6 +185,63 @@ export default function AdminPage() {
     }
   }
 
+  const handleAddJob = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setAddSubmitting(true)
+    setAddErrors({})
+    setAddSuccess('')
+
+    const payload = {
+      ...addFormData,
+      salaryMin: addFormData.salaryMin ? parseInt(addFormData.salaryMin) : undefined,
+      salaryMax: addFormData.salaryMax ? parseInt(addFormData.salaryMax) : undefined,
+      companyWebsite: addFormData.companyWebsite || undefined,
+      industry: addFormData.industry || undefined,
+    }
+
+    try {
+      const res = await fetch('/api/admin/jobs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+
+      if (res.status === 401) {
+        setIsAuthenticated(false)
+        return
+      }
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        if (data.fieldErrors) {
+          setAddErrors(data.fieldErrors)
+        } else {
+          setAddErrors({ _form: [data.error || 'Failed to create job'] })
+        }
+      } else {
+        setAddSuccess(`Job created successfully! Slug: ${data.slug}`)
+        setAddFormData({
+          companyName: '', companyWebsite: '', title: '', description: '',
+          category: CATEGORIES[0] as string, seniority: SENIORITY_LEVELS[0] as string,
+          industry: '', location: '', locationType: LOCATION_TYPES[0] as string,
+          region: REGIONS[0] as string, salaryMin: '', salaryMax: '',
+          salaryCurrency: 'EUR', applyUrl: '', contactEmail: '',
+        })
+        fetchJobs(status)
+        fetchStats()
+      }
+    } catch {
+      setAddErrors({ _form: ['Failed to create job. Please try again.'] })
+    } finally {
+      setAddSubmitting(false)
+    }
+  }
+
+  const updateField = (field: string, value: string) => {
+    setAddFormData(prev => ({ ...prev, [field]: value }))
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-brand-50">
@@ -264,6 +333,148 @@ export default function AdminPage() {
             <p className="text-2xl font-bold text-brand-400">{stats.expired}</p>
             <p className="text-brand-600 text-sm">Expired</p>
           </div>
+        </div>
+
+        {/* Add Single Job */}
+        <div className="card p-5 mb-8">
+          <button
+            onClick={() => { setShowAddForm(!showAddForm); setAddSuccess(''); setAddErrors({}) }}
+            className="flex items-center justify-between w-full"
+          >
+            <h3 className="font-semibold text-brand-900">Add Job Manually</h3>
+            <span className="text-brand-500 text-sm">{showAddForm ? '▲ Collapse' : '▼ Expand'}</span>
+          </button>
+
+          {showAddForm && (
+            <form onSubmit={handleAddJob} className="mt-4 space-y-4">
+              {addErrors._form && (
+                <div className="p-3 bg-red-50 rounded-lg text-red-700 text-sm">{addErrors._form[0]}</div>
+              )}
+              {addSuccess && (
+                <div className="p-3 bg-green-50 rounded-lg text-green-700 text-sm">{addSuccess}</div>
+              )}
+
+              {/* Company Info */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="label">Company Name *</label>
+                  <input className="input" value={addFormData.companyName} onChange={e => updateField('companyName', e.target.value)} required />
+                  {addErrors.companyName && <p className="text-red-500 text-xs mt-1">{addErrors.companyName[0]}</p>}
+                </div>
+                <div>
+                  <label className="label">Company Website</label>
+                  <input className="input" type="url" placeholder="https://..." value={addFormData.companyWebsite} onChange={e => updateField('companyWebsite', e.target.value)} />
+                  {addErrors.companyWebsite && <p className="text-red-500 text-xs mt-1">{addErrors.companyWebsite[0]}</p>}
+                </div>
+              </div>
+
+              {/* Job Title */}
+              <div>
+                <label className="label">Job Title *</label>
+                <input className="input" value={addFormData.title} onChange={e => updateField('title', e.target.value)} required />
+                {addErrors.title && <p className="text-red-500 text-xs mt-1">{addErrors.title[0]}</p>}
+              </div>
+
+              {/* Category, Seniority, Industry */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="label">Category *</label>
+                  <select className="input" value={addFormData.category} onChange={e => updateField('category', e.target.value)}>
+                    {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="label">Seniority *</label>
+                  <select className="input" value={addFormData.seniority} onChange={e => updateField('seniority', e.target.value)}>
+                    {SENIORITY_LEVELS.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="label">Industry</label>
+                  <select className="input" value={addFormData.industry} onChange={e => updateField('industry', e.target.value)}>
+                    <option value="">Select...</option>
+                    {INDUSTRIES.map(i => <option key={i} value={i}>{i}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              {/* Location */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="label">Location</label>
+                  <input className="input" placeholder="e.g. London, UK" value={addFormData.location} onChange={e => updateField('location', e.target.value)} />
+                  {addErrors.location && <p className="text-red-500 text-xs mt-1">{addErrors.location[0]}</p>}
+                </div>
+                <div>
+                  <label className="label">Location Type *</label>
+                  <select className="input" value={addFormData.locationType} onChange={e => updateField('locationType', e.target.value)}>
+                    {LOCATION_TYPES.map(l => <option key={l} value={l}>{l}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="label">Region *</label>
+                  <select className="input" value={addFormData.region} onChange={e => updateField('region', e.target.value)}>
+                    {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              {/* Salary */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="label">Salary Min</label>
+                  <input className="input" type="number" min="0" placeholder="e.g. 60000" value={addFormData.salaryMin} onChange={e => updateField('salaryMin', e.target.value)} />
+                  {addErrors.salaryMin && <p className="text-red-500 text-xs mt-1">{addErrors.salaryMin[0]}</p>}
+                </div>
+                <div>
+                  <label className="label">Salary Max</label>
+                  <input className="input" type="number" min="0" placeholder="e.g. 90000" value={addFormData.salaryMax} onChange={e => updateField('salaryMax', e.target.value)} />
+                </div>
+                <div>
+                  <label className="label">Currency</label>
+                  <select className="input" value={addFormData.salaryCurrency} onChange={e => updateField('salaryCurrency', e.target.value)}>
+                    {CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.code} ({c.symbol})</option>)}
+                  </select>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="label">Description * <span className="text-brand-400 font-normal">(supports **bold**, ## headings, - bullet points)</span></label>
+                <textarea
+                  className="input min-h-[200px]"
+                  value={addFormData.description}
+                  onChange={e => updateField('description', e.target.value)}
+                  placeholder="## About the role&#10;&#10;We are looking for...&#10;&#10;## Requirements&#10;&#10;- 3+ years experience in pricing&#10;- Strong analytical skills"
+                  required
+                />
+                {addErrors.description && <p className="text-red-500 text-xs mt-1">{addErrors.description[0]}</p>}
+              </div>
+
+              {/* Apply URL & Contact */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="label">Apply URL *</label>
+                  <input className="input" type="url" placeholder="https://..." value={addFormData.applyUrl} onChange={e => updateField('applyUrl', e.target.value)} required />
+                  {addErrors.applyUrl && <p className="text-red-500 text-xs mt-1">{addErrors.applyUrl[0]}</p>}
+                </div>
+                <div>
+                  <label className="label">Contact Email</label>
+                  <input className="input" type="email" placeholder="hr@company.com" value={addFormData.contactEmail} onChange={e => updateField('contactEmail', e.target.value)} />
+                  {addErrors.contactEmail && <p className="text-red-500 text-xs mt-1">{addErrors.contactEmail[0]}</p>}
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button type="submit" disabled={addSubmitting} className={`btn-primary btn-md ${addSubmitting ? 'opacity-50' : ''}`}>
+                  {addSubmitting ? 'Creating...' : 'Create Job'}
+                </button>
+                <button type="button" onClick={() => setShowAddForm(false)} className="btn-outline btn-md">
+                  Cancel
+                </button>
+              </div>
+            </form>
+          )}
         </div>
 
         {/* Bulk Upload Section */}
