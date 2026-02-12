@@ -23,19 +23,14 @@ export function Header() {
           
           {/* Navigation */}
           <nav className="hidden sm:flex items-center gap-1">
-            <Link 
-              href="/jobs" 
-              className={cn(
-                "px-4 py-2 rounded-lg text-sm font-medium transition-colors",
-                pathname === '/jobs' 
-                  ? "bg-brand-100 text-brand-900" 
-                  : "text-brand-600 hover:text-brand-900 hover:bg-brand-50"
-              )}
+            <Link
+              href="/jobs"
+              className="btn-accent btn-md"
             >
               Pricing Jobs
             </Link>
-            <Link 
-              href="/post-job" 
+            <Link
+              href="/post-job"
               className="btn-accent btn-md ml-2"
             >
               Post a Job
