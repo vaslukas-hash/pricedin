@@ -1,52 +1,15 @@
-import Database from 'better-sqlite3'
-import { drizzle } from 'drizzle-orm/better-sqlite3'
+import { config } from 'dotenv'
+config({ path: '.env.local' })
+
+import { createClient } from '@libsql/client'
+import { drizzle } from 'drizzle-orm/libsql'
 import * as schema from './schema'
-import path from 'path'
 
-const dbPath = path.join(process.cwd(), 'pricedin.db')
-const sqlite = new Database(dbPath)
-const db = drizzle(sqlite, { schema })
-
-// Create tables
-sqlite.exec(`
-  CREATE TABLE IF NOT EXISTS jobs (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    slug TEXT UNIQUE NOT NULL,
-    status TEXT DEFAULT 'pending' NOT NULL,
-    company_name TEXT NOT NULL,
-    company_website TEXT,
-    title TEXT NOT NULL,
-    description TEXT NOT NULL,
-    category TEXT NOT NULL,
-    seniority TEXT NOT NULL,
-    industry TEXT,
-    location TEXT NOT NULL,
-    location_type TEXT NOT NULL,
-    region TEXT NOT NULL,
-    salary_min INTEGER,
-    salary_max INTEGER,
-    salary_currency TEXT DEFAULT 'EUR',
-    apply_url TEXT NOT NULL,
-    contact_email TEXT NOT NULL,
-    is_featured INTEGER DEFAULT 0,
-    views INTEGER DEFAULT 0,
-    clicks INTEGER DEFAULT 0,
-    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-    approved_at TEXT,
-    expires_at TEXT
-  );
-
-  CREATE TABLE IF NOT EXISTS subscribers (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    email TEXT UNIQUE NOT NULL,
-    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-  );
-
-  CREATE INDEX IF NOT EXISTS idx_jobs_status ON jobs(status);
-  CREATE INDEX IF NOT EXISTS idx_jobs_category ON jobs(category);
-  CREATE INDEX IF NOT EXISTS idx_jobs_region ON jobs(region);
-  CREATE INDEX IF NOT EXISTS idx_jobs_created ON jobs(created_at);
-`)
+const client = createClient({
+  url: process.env.TURSO_DATABASE_URL!,
+  authToken: process.env.TURSO_AUTH_TOKEN,
+})
+const db = drizzle(client, { schema })
 
 const now = new Date().toISOString()
 const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
@@ -54,7 +17,7 @@ const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
 const seedJobs = [
   {
     slug: 'spotify-pricing-manager-stockholm-a1b2',
-    status: 'approved',
+    status: 'approved' as const,
     companyName: 'Spotify',
     companyWebsite: 'https://spotify.com',
     title: 'Pricing Manager',
@@ -84,12 +47,12 @@ We're looking for a Pricing Manager to join our Global Pricing team in Stockholm
 - Flexible work arrangements
 - Learning and development budget
 - Wellness stipend and comprehensive benefits`,
-    category: 'Pricing',
-    seniority: 'Manager',
+    category: 'Pricing' as const,
+    seniority: 'Manager' as const,
     industry: 'Technology',
     location: 'Stockholm, Sweden',
-    locationType: 'Hybrid',
-    region: 'Europe',
+    locationType: 'Hybrid' as const,
+    region: 'Europe' as const,
     salaryMin: 85000,
     salaryMax: 120000,
     salaryCurrency: 'EUR',
@@ -104,7 +67,7 @@ We're looking for a Pricing Manager to join our Global Pricing team in Stockholm
   },
   {
     slug: 'stripe-monetization-lead-sf-c3d4',
-    status: 'approved',
+    status: 'approved' as const,
     companyName: 'Stripe',
     companyWebsite: 'https://stripe.com',
     title: 'Monetization Lead',
@@ -135,12 +98,12 @@ Stripe is building the economic infrastructure for the internet. As our Monetiza
 - $5,000 annual learning stipend
 - Comprehensive health coverage
 - Generous parental leave`,
-    category: 'Monetization',
-    seniority: 'Lead',
+    category: 'Monetization' as const,
+    seniority: 'Lead' as const,
     industry: 'Fintech',
     location: 'San Francisco, CA',
-    locationType: 'Remote',
-    region: 'US',
+    locationType: 'Remote' as const,
+    region: 'US' as const,
     salaryMin: 180000,
     salaryMax: 250000,
     salaryCurrency: 'USD',
@@ -155,7 +118,7 @@ Stripe is building the economic infrastructure for the internet. As our Monetiza
   },
   {
     slug: 'netflix-revenue-strategy-director-la-e5f6',
-    status: 'approved',
+    status: 'approved' as const,
     companyName: 'Netflix',
     companyWebsite: 'https://netflix.com',
     title: 'Director, Revenue Strategy',
@@ -186,12 +149,12 @@ You'll lead strategic initiatives that drive Netflix's revenue growth across sub
 ## Our Culture
 
 We believe in freedom and responsibility. You'll have the autonomy to make impactful decisions while being accountable for results.`,
-    category: 'Revenue Strategy',
-    seniority: 'Head/Director',
+    category: 'Revenue Strategy' as const,
+    seniority: 'Head/Director' as const,
     industry: 'Entertainment',
     location: 'Los Angeles, CA',
-    locationType: 'Onsite',
-    region: 'US',
+    locationType: 'Onsite' as const,
+    region: 'US' as const,
     salaryMin: 250000,
     salaryMax: 350000,
     salaryCurrency: 'USD',
@@ -206,7 +169,7 @@ We believe in freedom and responsibility. You'll have the autonomy to make impac
   },
   {
     slug: 'wise-commercial-strategy-analyst-london-g7h8',
-    status: 'approved',
+    status: 'approved' as const,
     companyName: 'Wise',
     companyWebsite: 'https://wise.com',
     title: 'Commercial Strategy Analyst',
@@ -241,12 +204,12 @@ Join our Commercial Strategy team to help Wise grow sustainably while keeping ou
 - £1,000 annual learning budget
 - Sabbatical after 4 years
 - RSUs that actually vest`,
-    category: 'Commercial Strategy',
-    seniority: 'Analyst',
+    category: 'Commercial Strategy' as const,
+    seniority: 'Analyst' as const,
     industry: 'Fintech',
     location: 'London, UK',
-    locationType: 'Hybrid',
-    region: 'UK',
+    locationType: 'Hybrid' as const,
+    region: 'UK' as const,
     salaryMin: 55000,
     salaryMax: 75000,
     salaryCurrency: 'GBP',
@@ -261,7 +224,7 @@ Join our Commercial Strategy team to help Wise grow sustainably while keeping ou
   },
   {
     slug: 'shopify-pricing-operations-manager-toronto-i9j0',
-    status: 'approved',
+    status: 'approved' as const,
     companyName: 'Shopify',
     companyWebsite: 'https://shopify.com',
     title: 'Pricing Operations Manager',
@@ -292,12 +255,12 @@ Shopify powers millions of businesses worldwide. We're looking for a Pricing Ope
 - Flexible vacation policy
 - $5,000 annual lifestyle spending account
 - Home office setup budget`,
-    category: 'Pricing',
-    seniority: 'Manager',
+    category: 'Pricing' as const,
+    seniority: 'Manager' as const,
     industry: 'E-commerce',
     location: 'Toronto, Canada',
-    locationType: 'Remote',
-    region: 'Canada',
+    locationType: 'Remote' as const,
+    region: 'Canada' as const,
     salaryMin: 100000,
     salaryMax: 140000,
     salaryCurrency: 'CAD',
@@ -312,7 +275,7 @@ Shopify powers millions of businesses worldwide. We're looking for a Pricing Ope
   },
   {
     slug: 'klarna-vp-pricing-stockholm-k1l2',
-    status: 'approved',
+    status: 'approved' as const,
     companyName: 'Klarna',
     companyWebsite: 'https://klarna.com',
     title: 'VP of Pricing',
@@ -346,12 +309,12 @@ Lead a team of pricing professionals to optimize Klarna's pricing across merchan
 - Lead a critical business function
 - Competitive package with significant equity
 - Work with talented teams across the globe`,
-    category: 'Pricing',
-    seniority: 'VP',
+    category: 'Pricing' as const,
+    seniority: 'VP' as const,
     industry: 'Fintech',
     location: 'Stockholm, Sweden',
-    locationType: 'Hybrid',
-    region: 'Europe',
+    locationType: 'Hybrid' as const,
+    region: 'Europe' as const,
     salaryMin: 200000,
     salaryMax: 280000,
     salaryCurrency: 'EUR',
@@ -366,7 +329,7 @@ Lead a team of pricing professionals to optimize Klarna's pricing across merchan
   },
   {
     slug: 'revolut-senior-pricing-analyst-london-m3n4',
-    status: 'approved',
+    status: 'approved' as const,
     companyName: 'Revolut',
     companyWebsite: 'https://revolut.com',
     title: 'Senior Pricing Analyst',
@@ -397,12 +360,12 @@ Revolut is building the world's first truly global financial super app. Join our
 - Flexible remote work
 - Learning budget and career growth
 - Team events and socials`,
-    category: 'Pricing',
-    seniority: 'Senior',
+    category: 'Pricing' as const,
+    seniority: 'Senior' as const,
     industry: 'Fintech',
     location: 'London, UK',
-    locationType: 'Hybrid',
-    region: 'UK',
+    locationType: 'Hybrid' as const,
+    region: 'UK' as const,
     salaryMin: 70000,
     salaryMax: 95000,
     salaryCurrency: 'GBP',
@@ -417,7 +380,7 @@ Revolut is building the world's first truly global financial super app. Join our
   },
   {
     slug: 'booking-head-revenue-strategy-amsterdam-o5p6',
-    status: 'approved',
+    status: 'approved' as const,
     companyName: 'Booking.com',
     companyWebsite: 'https://booking.com',
     title: 'Head of Revenue Strategy',
@@ -452,12 +415,12 @@ Lead revenue strategy across our accommodation, flights, and experiences vertica
 - Annual travel credit
 - Professional development programs
 - Diverse, international team environment`,
-    category: 'Revenue Strategy',
-    seniority: 'Head/Director',
+    category: 'Revenue Strategy' as const,
+    seniority: 'Head/Director' as const,
     industry: 'Travel',
     location: 'Amsterdam, Netherlands',
-    locationType: 'Hybrid',
-    region: 'Europe',
+    locationType: 'Hybrid' as const,
+    region: 'Europe' as const,
     salaryMin: 150000,
     salaryMax: 200000,
     salaryCurrency: 'EUR',
@@ -472,7 +435,7 @@ Lead revenue strategy across our accommodation, flights, and experiences vertica
   },
   {
     slug: 'deliveryhero-monetization-manager-berlin-q7r8',
-    status: 'approved',
+    status: 'approved' as const,
     companyName: 'Delivery Hero',
     companyWebsite: 'https://deliveryhero.com',
     title: 'Monetization Manager',
@@ -507,12 +470,12 @@ Own monetization strategy for one of our key markets or product verticals. You'l
 - Meal vouchers and delivery credits
 - Learning and conference budget
 - International team environment`,
-    category: 'Monetization',
-    seniority: 'Manager',
+    category: 'Monetization' as const,
+    seniority: 'Manager' as const,
     industry: 'Delivery',
     location: 'Berlin, Germany',
-    locationType: 'Hybrid',
-    region: 'Europe',
+    locationType: 'Hybrid' as const,
+    region: 'Europe' as const,
     salaryMin: 75000,
     salaryMax: 100000,
     salaryCurrency: 'EUR',
@@ -527,7 +490,7 @@ Own monetization strategy for one of our key markets or product verticals. You'l
   },
   {
     slug: 'n26-commercial-strategy-lead-berlin-s9t0',
-    status: 'approved',
+    status: 'approved' as const,
     companyName: 'N26',
     companyWebsite: 'https://n26.com',
     title: 'Commercial Strategy Lead',
@@ -562,12 +525,12 @@ Lead strategic initiatives that shape N26's commercial success across European m
 - Hybrid work model
 - Personal development budget
 - Mental health support`,
-    category: 'Commercial Strategy',
-    seniority: 'Lead',
+    category: 'Commercial Strategy' as const,
+    seniority: 'Lead' as const,
     industry: 'Fintech',
     location: 'Berlin, Germany',
-    locationType: 'Hybrid',
-    region: 'Europe',
+    locationType: 'Hybrid' as const,
+    region: 'Europe' as const,
     salaryMin: 90000,
     salaryMax: 130000,
     salaryCurrency: 'EUR',
@@ -582,39 +545,18 @@ Lead strategic initiatives that shape N26's commercial success across European m
   },
 ]
 
-// Clear existing data
-sqlite.exec('DELETE FROM jobs;')
+async function seed() {
+  console.log('Seeding database...')
 
-// Insert seed data
-console.log('🌱 Seeding database...')
+  // Clear existing data
+  await client.execute('DELETE FROM jobs;')
 
-for (const job of seedJobs) {
-  db.insert(schema.jobs).values({
-    slug: job.slug,
-    status: job.status as 'pending' | 'approved' | 'rejected' | 'expired',
-    companyName: job.companyName,
-    companyWebsite: job.companyWebsite,
-    title: job.title,
-    description: job.description,
-    category: job.category as 'Pricing' | 'Monetization' | 'Revenue Strategy' | 'Commercial Strategy',
-    seniority: job.seniority as 'Analyst' | 'Manager' | 'Senior' | 'Lead' | 'Head/Director' | 'VP',
-    industry: job.industry,
-    location: job.location,
-    locationType: job.locationType as 'Remote' | 'Hybrid' | 'Onsite',
-    region: job.region as 'Europe' | 'UK' | 'US' | 'Canada' | 'APAC',
-    salaryMin: job.salaryMin,
-    salaryMax: job.salaryMax,
-    salaryCurrency: job.salaryCurrency,
-    applyUrl: job.applyUrl,
-    contactEmail: job.contactEmail,
-    isFeatured: job.isFeatured,
-    views: job.views,
-    clicks: job.clicks,
-    createdAt: job.createdAt,
-    approvedAt: job.approvedAt,
-    expiresAt: job.expiresAt,
-  }).run()
+  for (const job of seedJobs) {
+    await db.insert(schema.jobs).values(job)
+  }
+
+  console.log(`Seeded ${seedJobs.length} jobs`)
+  console.log('Database ready!')
 }
 
-console.log(`✅ Seeded ${seedJobs.length} jobs`)
-console.log('🎉 Database ready!')
+seed().catch(console.error)
