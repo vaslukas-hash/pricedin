@@ -5,7 +5,7 @@ import { eq, desc, and, gt } from 'drizzle-orm'
 import { Header, Footer, JobsListWithModal, NewsletterSignup } from '@/components'
 import { CATEGORIES } from '@/lib/constants'
 
-export const revalidate = 60 // Revalidate every 60 seconds
+export const dynamic = 'force-dynamic'
 
 async function getAllJobs() {
   return db.select()

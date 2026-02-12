@@ -7,7 +7,7 @@ import { eq, and, ne, desc } from 'drizzle-orm'
 import { Header, Footer, JobCard, NewsletterSignup } from '@/components'
 import { formatSalary, formatDate, timeAgo, sanitizeHtml } from '@/lib/utils'
 
-export const revalidate = 60
+export const dynamic = 'force-dynamic'
 
 interface JobPageProps {
   params: Promise<{ slug: string }>

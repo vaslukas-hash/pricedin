@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description: 'Search and filter pricing jobs, monetization careers, and revenue strategy roles. Updated daily with new opportunities from leading employers.',
 }
 
-export const revalidate = 60
+export const dynamic = 'force-dynamic'
 
 interface SearchParams {
   q?: string
