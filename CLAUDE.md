@@ -4,7 +4,7 @@ Niche job board for pricing, monetization, revenue strategy and commercial strat
 
 ## Stack
 
-- Next.js 14 (App Router, TypeScript), React 18, Tailwind 3 (+ typography plugin), Geist font
+- Next.js 15 (App Router, TypeScript), React 19, Tailwind 3 (+ typography plugin), Geist font
 - Database: **Turso (libSQL)** via Drizzle ORM (`@libsql/client`). Not local SQLite — the README is outdated on this.
 - Validation: Zod. Excel bulk upload: `xlsx`.
 - Path alias: `@/` → `src/`
