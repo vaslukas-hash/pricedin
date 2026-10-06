@@ -14,13 +14,14 @@ Niche job board for pricing, monetization, revenue strategy and commercial strat
 ```bash
 npm install
 npm run dev          # local dev server on :3000
-npm run lint
+npm run typecheck    # tsc --noEmit
+npm test             # unit tests (node:test via tsx), src/**/*.test.ts
 npm run build        # must pass before opening a PR
 npm run db:push      # push schema to the Turso DB in .env.local
 npm run db:seed      # seed sample jobs (WRITES to the DB in .env.local)
 ```
 
-There is no test suite yet. Verify with `npm run lint`, `npm run build`, and by loading the affected pages in the browser.
+CI (.github/workflows/ci.yml) runs typecheck, tests and build on every PR and on pushes to main, with throwaway env values. `npm run lint` is not configured (it prompts for ESLint setup), so do not rely on it. Add a `*.test.ts` next to the code for any bug fix or pure-logic change; also load affected pages in the browser.
 
 ## Environment
 
@@ -62,7 +63,7 @@ Design tokens live in `tailwind.config.ts`: `brand-*` (neutral slate) and `accen
 
 1. Work on a branch `feat/…`, `fix/…` or `chore/…`; never commit directly to `main` (a push to `main` deploys to production).
 2. Small, focused commits with descriptive messages (what and why), not "Update X".
-3. Before opening a PR: `npm run lint` and `npm run build` pass, and the change was checked in the browser.
+3. Before opening a PR: `npm run typecheck`, `npm test` and `npm run build` pass, and the change was checked in the browser. Wait for the CI check to be green before merging.
 4. Open a PR with `gh pr create`; Vercel posts a preview URL. The owner reviews and merges.
 5. For changes touching the DB schema, auth, or more than ~3 files, outline the plan and get approval before coding.
 6. Tasks come from GitHub Issues (`gh issue list`). Reference the issue in the PR (`Closes #n`).
