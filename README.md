@@ -68,7 +68,7 @@ Open [http://localhost:3000](http://localhost:3000)
 ## Admin Access
 
 1. Navigate to `/admin`
-2. Enter the password from `ADMIN_PASSWORD` env var (default: `pricedin-admin-2024`)
+2. Enter the password from `ADMIN_PASSWORD` env var
 3. Approve/reject pending jobs
 4. Feature jobs to highlight them
 5. View analytics (views & clicks)

@@ -1,16 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import * as XLSX from 'xlsx'
-import { cookies } from 'next/headers'
+import { isAdminAuthenticated } from '@/lib/admin-auth'
 import { db } from '@/lib/db'
 import { jobs } from '@/lib/db/schema'
 import { jobFormSchema } from '@/lib/validations'
 import { generateSlug, getExpirationDate, sanitizeHtml } from '@/lib/utils'
-
-async function isAuthenticated(): Promise<boolean> {
-  const cookieStore = await cookies()
-  const authCookie = cookieStore.get('admin_auth')
-  return authCookie?.value === process.env.ADMIN_PASSWORD
-}
 
 const COLUMN_MAP: Record<string, string> = {
   companyname: 'companyName',
@@ -31,7 +25,7 @@ const COLUMN_MAP: Record<string, string> = {
 }
 
 export async function POST(request: NextRequest) {
-  if (!(await isAuthenticated())) {
+  if (!(await isAdminAuthenticated())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

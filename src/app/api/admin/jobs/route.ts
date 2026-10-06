@@ -4,16 +4,10 @@ import { jobs } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 import { generateSlug, getExpirationDate, sanitizeHtml } from '@/lib/utils'
 import { jobFormSchema } from '@/lib/validations'
-import { cookies } from 'next/headers'
-
-function isAuthenticated(request: NextRequest): boolean {
-  const cookieStore = cookies()
-  const authCookie = cookieStore.get('admin_auth')
-  return authCookie?.value === process.env.ADMIN_PASSWORD
-}
+import { isAdminAuthenticated } from '@/lib/admin-auth'
 
 export async function GET(request: NextRequest) {
-  if (!isAuthenticated(request)) {
+  if (!(await isAdminAuthenticated())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   
@@ -34,7 +28,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  if (!isAuthenticated(request)) {
+  if (!(await isAdminAuthenticated())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -88,7 +82,7 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
-  if (!isAuthenticated(request)) {
+  if (!(await isAdminAuthenticated())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   
@@ -129,7 +123,7 @@ export async function PATCH(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  if (!isAuthenticated(request)) {
+  if (!(await isAdminAuthenticated())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   
