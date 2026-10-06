@@ -1,29 +1,14 @@
 'use client'
 
 import { Modal } from './Modal'
-import { formatSalary, timeAgo, sanitizeHtml } from '@/lib/utils'
+import { formatSalary, timeAgo } from '@/lib/utils'
+import { renderDescription } from '@/lib/description'
 import type { Job } from '@/lib/db/schema'
 
 interface JobDetailModalProps {
   job: Job | null
   isOpen: boolean
   onClose: () => void
-}
-
-function renderDescription(description: string) {
-  const sanitized = sanitizeHtml(description)
-
-  // Convert markdown-style formatting to HTML
-  const html = sanitized
-    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^\- (.+)$/gm, '<li>$1</li>')
-    .replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\n\n/g, '</p><p>')
-    .replace(/^(?!<[hul])(.+)$/gm, '<p>$1</p>')
-
-  return html
 }
 
 function ApplyButton({ job }: { job: Job }) {

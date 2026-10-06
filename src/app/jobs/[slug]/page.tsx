@@ -5,7 +5,8 @@ import { db } from '@/lib/db'
 import { jobs } from '@/lib/db/schema'
 import { eq, and, ne, desc } from 'drizzle-orm'
 import { Header, Footer, JobCard, NewsletterSignup } from '@/components'
-import { formatSalary, formatDate, timeAgo, sanitizeHtml } from '@/lib/utils'
+import { formatSalary, formatDate, timeAgo } from '@/lib/utils'
+import { renderDescription, safeJsonLd } from '@/lib/description'
 
 export const dynamic = 'force-dynamic'
 
@@ -118,7 +119,7 @@ function JobPostingJsonLd({ job }: { job: NonNullable<Awaited<ReturnType<typeof 
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }}
     />
   )
 }
@@ -144,23 +145,6 @@ function ApplyButton({ job }: { job: NonNullable<Awaited<ReturnType<typeof getJo
       </svg>
     </a>
   )
-}
-
-// Simple markdown-like rendering
-function renderDescription(description: string) {
-  const sanitized = sanitizeHtml(description)
-  
-  // Convert markdown-style formatting to HTML
-  const html = sanitized
-    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^\- (.+)$/gm, '<li>$1</li>')
-    .replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\n\n/g, '</p><p>')
-    .replace(/^(?!<[hul])(.+)$/gm, '<p>$1</p>')
-  
-  return html
 }
 
 export default async function JobPage({ params }: JobPageProps) {
