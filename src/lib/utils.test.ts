@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { formatSalary, generateSlug, timeAgo, getExpirationDate } from './utils'
+import { formatSalary, generateSlug, timeAgo, getExpirationDate, parseDate, formatDate } from './utils'
 
 test('formatSalary: ranges, open-ended and missing values', () => {
   assert.equal(formatSalary(80000, 120000, 'EUR'), '€80k - €120k')
@@ -33,4 +33,16 @@ test('timeAgo: buckets by age', () => {
 test('getExpirationDate is about 30 days out', () => {
   const days = (new Date(getExpirationDate()).getTime() - Date.now()) / 86_400_000
   assert.ok(days > 29.9 && days < 30.1, `got ${days}`)
+})
+
+test('parseDate returns null for missing or invalid values', () => {
+  assert.equal(parseDate(null), null)
+  assert.equal(parseDate(''), null)
+  assert.equal(parseDate('CURRENT_TIMESTAMP'), null)
+  assert.equal(parseDate('2026-02-12T20:27:04.000Z')?.getUTCFullYear(), 2026)
+})
+
+test('timeAgo and formatDate tolerate legacy CURRENT_TIMESTAMP values', () => {
+  assert.equal(timeAgo('CURRENT_TIMESTAMP'), '')
+  assert.equal(formatDate('CURRENT_TIMESTAMP'), '')
 })

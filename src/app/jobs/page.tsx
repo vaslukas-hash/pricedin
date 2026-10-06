@@ -4,6 +4,7 @@ import { db } from '@/lib/db'
 import { jobs } from '@/lib/db/schema'
 import { eq, desc, and, like, or, gte, lte } from 'drizzle-orm'
 import { Header, Footer, JobFilters, NewsletterSignup, JobsListWithModal } from '@/components'
+import { parseDate } from '@/lib/utils'
 
 export const metadata: Metadata = {
   title: 'Browse Pricing Jobs & Revenue Strategy Careers',
@@ -81,8 +82,8 @@ async function getJobs(params: SearchParams) {
     const cutoff = new Date()
     cutoff.setDate(cutoff.getDate() - days)
     allJobs = allJobs.filter(j => {
-      if (!j.createdAt) return false
-      return new Date(j.createdAt) >= cutoff
+      const created = parseDate(j.createdAt)
+      return created !== null && created >= cutoff
     })
   }
   
