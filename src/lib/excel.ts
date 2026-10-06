@@ -29,7 +29,7 @@ function cellValue(v: ExcelJS.CellValue): unknown {
 
 // Read the first sheet: row 1 is the header, later rows become objects.
 // Fully blank rows are skipped. Throws if the file is not a readable .xlsx.
-export async function readFirstSheetRows(data: ArrayBuffer | Buffer): Promise<SheetRow[]> {
+export async function readFirstSheetRows(data: ArrayBuffer | Uint8Array): Promise<SheetRow[]> {
   const workbook = new ExcelJS.Workbook()
   await workbook.xlsx.load(data as ArrayBuffer)
 
