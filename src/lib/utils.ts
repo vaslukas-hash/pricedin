@@ -26,9 +26,17 @@ export function formatSalary(min: number | null, max: number | null, currency: s
   return 'Competitive'
 }
 
+// Parse a stored timestamp; returns null for missing or unparseable values
+// (e.g. legacy rows holding the literal text 'CURRENT_TIMESTAMP').
+export function parseDate(value: string | null | undefined): Date | null {
+  if (!value) return null
+  const date = new Date(value)
+  return Number.isNaN(date.getTime()) ? null : date
+}
+
 export function formatDate(dateString: string | null): string {
-  if (!dateString) return ''
-  const date = new Date(dateString)
+  const date = parseDate(dateString)
+  if (!date) return ''
   return date.toLocaleDateString('en-US', { 
     month: 'short', 
     day: 'numeric', 
@@ -37,9 +45,9 @@ export function formatDate(dateString: string | null): string {
 }
 
 export function timeAgo(dateString: string | null): string {
-  if (!dateString) return ''
+  const date = parseDate(dateString)
+  if (!date) return ''
   
-  const date = new Date(dateString)
   const now = new Date()
   const diffMs = now.getTime() - date.getTime()
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))

@@ -44,7 +44,7 @@ export const jobs = sqliteTable('jobs', {
   clicks: integer('clicks').default(0),
   
   // Timestamps
-  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+  createdAt: text('created_at').$defaultFn(() => new Date().toISOString()),
   approvedAt: text('approved_at'),
   expiresAt: text('expires_at'),
 })
@@ -52,7 +52,7 @@ export const jobs = sqliteTable('jobs', {
 export const subscribers = sqliteTable('subscribers', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   email: text('email').notNull().unique(),
-  createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
+  createdAt: text('created_at').$defaultFn(() => new Date().toISOString()),
 })
 
 // Type exports

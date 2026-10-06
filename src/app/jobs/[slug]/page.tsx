@@ -5,7 +5,7 @@ import { db } from '@/lib/db'
 import { jobs } from '@/lib/db/schema'
 import { eq, and, ne, desc } from 'drizzle-orm'
 import { Header, Footer, JobCard, NewsletterSignup, ApplyButton, ShareButton } from '@/components'
-import { formatSalary, formatDate, timeAgo } from '@/lib/utils'
+import { formatSalary, formatDate, timeAgo, parseDate } from '@/lib/utils'
 import { renderDescription, safeJsonLd } from '@/lib/description'
 
 export const dynamic = 'force-dynamic'
@@ -84,7 +84,7 @@ function JobPostingJsonLd({ job }: { job: NonNullable<Awaited<ReturnType<typeof 
       name: job.companyName,
       value: job.slug,
     },
-    datePosted: job.createdAt,
+    datePosted: parseDate(job.createdAt)?.toISOString(),
     validThrough: job.expiresAt,
     employmentType: job.locationType === 'Remote' ? 'FULL_TIME' : 'FULL_TIME',
     hiringOrganization: {

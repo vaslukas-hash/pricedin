@@ -4,6 +4,7 @@ import { MetadataRoute } from 'next'
 import { db } from '@/lib/db'
 import { jobs } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
+import { parseDate } from '@/lib/utils'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
@@ -38,7 +39,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Job pages
   const jobPages = approvedJobs.map(job => ({
     url: `${baseUrl}/jobs/${job.slug}`,
-    lastModified: job.createdAt ? new Date(job.createdAt) : new Date(),
+    lastModified: parseDate(job.createdAt) ?? new Date(),
     changeFrequency: 'weekly' as const,
     priority: 0.8,
   }))
