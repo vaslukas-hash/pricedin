@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import * as XLSX from 'xlsx'
 import { isAdminAuthenticated } from '@/lib/admin-auth'
 import { db } from '@/lib/db'
 import { jobs } from '@/lib/db/schema'
 import { jobFormSchema } from '@/lib/validations'
 import { generateSlug, getExpirationDate, sanitizeHtml } from '@/lib/utils'
+import { readFirstSheetRows, MAX_UPLOAD_BYTES, MAX_UPLOAD_ROWS, type SheetRow } from '@/lib/excel'
 
 const COLUMN_MAP: Record<string, string> = {
   companyname: 'companyName',
@@ -37,31 +37,45 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 })
     }
 
-    if (!file.name.endsWith('.xlsx') && !file.name.endsWith('.xls')) {
-      return NextResponse.json({ error: 'Please upload an Excel file (.xlsx or .xls)' }, { status: 400 })
+    if (!file.name.toLowerCase().endsWith('.xlsx')) {
+      return NextResponse.json(
+        { error: 'Please upload an Excel .xlsx file (re-save older .xls files as .xlsx)' },
+        { status: 400 }
+      )
     }
 
-    const arrayBuffer = await file.arrayBuffer()
-    const wb = XLSX.read(arrayBuffer, { type: 'array' })
-
-    const sheetName = wb.SheetNames[0]
-    if (!sheetName) {
-      return NextResponse.json({ error: 'Excel file has no sheets' }, { status: 400 })
+    if (file.size > MAX_UPLOAD_BYTES) {
+      return NextResponse.json(
+        { error: `File is too large (max ${MAX_UPLOAD_BYTES / 1024 / 1024} MB)` },
+        { status: 413 }
+      )
     }
 
-    const ws = wb.Sheets[sheetName]
-    const rawRows: Record<string, unknown>[] = XLSX.utils.sheet_to_json(ws)
+    let rawRows: SheetRow[]
+    try {
+      rawRows = await readFirstSheetRows(await file.arrayBuffer())
+    } catch {
+      return NextResponse.json(
+        { error: 'Could not read the file. Make sure it is a valid .xlsx spreadsheet.' },
+        { status: 400 }
+      )
+    }
 
     if (rawRows.length === 0) {
       return NextResponse.json({ error: 'No data rows found in the spreadsheet' }, { status: 400 })
     }
 
+    if (rawRows.length > MAX_UPLOAD_ROWS) {
+      return NextResponse.json(
+        { error: `Too many rows (${rawRows.length}). Upload at most ${MAX_UPLOAD_ROWS} jobs at a time.` },
+        { status: 400 }
+      )
+    }
+
     const results: { row: number; status: 'success' | 'error'; slug?: string; errors?: Record<string, string[]> }[] = []
     let successCount = 0
 
-    for (let i = 0; i < rawRows.length; i++) {
-      const raw = rawRows[i]
-      const rowNum = i + 2 // Row 1 is header, data starts at row 2
+    for (const { row: rowNum, values: raw } of rawRows) {
 
       // Normalize keys (case-insensitive mapping)
       const normalized: Record<string, unknown> = {}

@@ -491,7 +491,7 @@ export default function AdminPage() {
               {uploading ? 'Uploading...' : 'Upload Excel File'}
               <input
                 type="file"
-                accept=".xlsx,.xls"
+                accept=".xlsx"
                 onChange={handleFileUpload}
                 disabled={uploading}
                 className="hidden"
