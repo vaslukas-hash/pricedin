@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { db } from '@/lib/db'
 import { jobs } from '@/lib/db/schema'
 import { eq, and, ne, desc } from 'drizzle-orm'
-import { Header, Footer, JobCard, NewsletterSignup } from '@/components'
+import { Header, Footer, JobCard, NewsletterSignup, ApplyButton, ShareButton } from '@/components'
 import { formatSalary, formatDate, timeAgo } from '@/lib/utils'
 import { renderDescription, safeJsonLd } from '@/lib/description'
 
@@ -124,29 +124,6 @@ function JobPostingJsonLd({ job }: { job: NonNullable<Awaited<ReturnType<typeof 
   )
 }
 
-function ApplyButton({ job }: { job: NonNullable<Awaited<ReturnType<typeof getJob>>> }) {
-  return (
-    <a
-      href={job.applyUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      onClick={() => {
-        fetch('/api/analytics/click', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ jobId: job.id }),
-        }).catch(() => {})
-      }}
-      className="btn-accent btn-lg w-full sm:w-auto"
-    >
-      Apply Now
-      <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-      </svg>
-    </a>
-  )
-}
-
 export default async function JobPage({ params }: JobPageProps) {
   const { slug } = await params
   const job = await getJob(slug)
@@ -249,16 +226,8 @@ export default async function JobPage({ params }: JobPageProps) {
             
             {/* CTA */}
             <div className="mt-6 pt-6 border-t border-brand-100 flex flex-col sm:flex-row gap-4">
-              <ApplyButton job={job} />
-              <button
-                onClick={() => navigator.share?.({ title: job.title, url: window.location.href })}
-                className="btn-outline btn-md"
-              >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                </svg>
-                Share
-              </button>
+              <ApplyButton jobId={job.id} applyUrl={job.applyUrl} />
+              <ShareButton title={job.title} />
             </div>
           </div>
           
@@ -277,7 +246,7 @@ export default async function JobPage({ params }: JobPageProps) {
             <p className="text-brand-600 mb-4">
               Apply now on {job.companyName}&apos;s website. Great pricing roles fill fast.
             </p>
-            <ApplyButton job={job} />
+            <ApplyButton jobId={job.id} applyUrl={job.applyUrl} />
           </div>
           
           {/* Similar Jobs */}
