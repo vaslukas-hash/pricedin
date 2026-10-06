@@ -3,38 +3,26 @@ import { db } from '@/lib/db'
 import { jobs } from '@/lib/db/schema'
 import { generateSlug, getExpirationDate, sanitizeHtml } from '@/lib/utils'
 import { jobFormSchema } from '@/lib/validations'
+import { getClientIp, hit, retryAfterSeconds } from '@/lib/rate-limit'
 
-// Simple in-memory rate limiting
-const rateLimit = new Map<string, { count: number; resetTime: number }>()
-const RATE_LIMIT_WINDOW = 60 * 60 * 1000 // 1 hour
-const RATE_LIMIT_MAX = 5 // 5 submissions per hour
-
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now()
-  const entry = rateLimit.get(ip)
-  
-  if (!entry || now > entry.resetTime) {
-    rateLimit.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW })
-    return true
-  }
-  
-  if (entry.count >= RATE_LIMIT_MAX) {
-    return false
-  }
-  
-  entry.count++
-  return true
-}
+// 5 submissions per IP per hour (shared across serverless instances via the DB)
+const SUBMIT_WINDOW_MS = 60 * 60 * 1000
+const SUBMIT_MAX = 5
 
 export async function POST(request: NextRequest) {
   try {
-    // Rate limiting
-    const ip = request.headers.get('x-forwarded-for') || 'unknown'
-    if (!checkRateLimit(ip)) {
-      return NextResponse.json(
-        { error: 'Too many submissions. Please try again later.' },
-        { status: 429 }
-      )
+    // Rate limiting. If the limiter itself fails, let the request through
+    // rather than blocking legitimate submissions.
+    try {
+      const state = await hit('submit-job', getClientIp(request.headers), SUBMIT_WINDOW_MS)
+      if (state.count > SUBMIT_MAX) {
+        return NextResponse.json(
+          { error: 'Too many submissions. Please try again later.' },
+          { status: 429, headers: { 'Retry-After': String(retryAfterSeconds(state)) } }
+        )
+      }
+    } catch (err) {
+      console.error('Rate limiter error (failing open):', err)
     }
     
     const body = await request.json()

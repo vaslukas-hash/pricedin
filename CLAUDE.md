@@ -56,6 +56,7 @@ Design tokens live in `tailwind.config.ts`: `brand-*` (neutral slate) and `accen
 - Enum-like values (category, seniority, region, location type, currency) are defined in `src/lib/constants.ts` **and** duplicated as enums in `src/lib/db/schema.ts`. Change both together, plus any form/filter that lists them.
 - New user input goes through a Zod schema in `src/lib/validations.ts`; reuse `jobFormSchema` for anything that creates jobs.
 - Job lifecycle: `pending` → `approved` | `rejected` → `expired` (30 days after approval, see `getExpirationDate`). Public pages only show `approved`.
+- Rate limiting for public/auth endpoints lives in `src/lib/rate-limit.ts` (counts in a `rate_limits` table in Turso, created automatically on first use; keys are hashed IPs). Use `hit`/`peek`/`reset` there; do not use in-memory maps (serverless instances do not share memory).
 - Admin routes check the `admin_auth` cookie; every new admin route must do the same.
 - Match the existing style: 2-space indent, no semicolons, single quotes, Tailwind utility classes inline.
 
