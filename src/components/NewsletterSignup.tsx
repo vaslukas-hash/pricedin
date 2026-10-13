@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { trackEvent } from '@/lib/analytics'
 
 export function NewsletterSignup() {
   const [email, setEmail] = useState('')
@@ -22,6 +23,7 @@ export function NewsletterSignup() {
       
       if (res.ok) {
         setStatus('success')
+        trackEvent({ name: 'newsletter_signup', params: {} })
         setMessage('Thanks for subscribing!')
         setEmail('')
       } else {

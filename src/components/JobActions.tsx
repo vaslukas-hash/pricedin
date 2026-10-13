@@ -1,17 +1,21 @@
 'use client'
 
+import { trackEvent } from '@/lib/analytics'
+
 interface ApplyButtonProps {
   jobId: number
   applyUrl: string
+  company: string
 }
 
-export function ApplyButton({ jobId, applyUrl }: ApplyButtonProps) {
+export function ApplyButton({ jobId, applyUrl, company }: ApplyButtonProps) {
   return (
     <a
       href={applyUrl}
       target="_blank"
       rel="noopener noreferrer"
       onClick={() => {
+        trackEvent({ name: 'apply_click', params: { job_id: jobId, company } })
         fetch('/api/analytics/click', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

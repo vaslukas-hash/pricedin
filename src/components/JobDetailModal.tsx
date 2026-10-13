@@ -1,5 +1,7 @@
 'use client'
 
+import { useEffect } from 'react'
+import { trackEvent } from '@/lib/analytics'
 import { Modal } from './Modal'
 import { formatSalary, timeAgo } from '@/lib/utils'
 import { renderDescription } from '@/lib/description'
@@ -13,6 +15,8 @@ interface JobDetailModalProps {
 
 function ApplyButton({ job }: { job: Job }) {
   const handleClick = () => {
+    trackEvent({ name: 'apply_click', params: { job_id: job.id, company: job.companyName } })
+
     // Track click analytics
     fetch('/api/analytics/click', {
       method: 'POST',
@@ -38,6 +42,14 @@ function ApplyButton({ job }: { job: Job }) {
 }
 
 export function JobDetailModal({ job, isOpen, onClose }: JobDetailModalProps) {
+  const jobId = job?.id
+  const company = job?.companyName
+  useEffect(() => {
+    if (isOpen && jobId !== undefined && company !== undefined) {
+      trackEvent({ name: 'job_view', params: { job_id: jobId, company } })
+    }
+  }, [isOpen, jobId, company])
+
   if (!job) return null
 
   const salary = formatSalary(job.salaryMin, job.salaryMax, job.salaryCurrency || 'EUR')
