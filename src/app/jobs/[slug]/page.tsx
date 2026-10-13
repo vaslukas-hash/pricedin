@@ -8,6 +8,7 @@ import { TrackJobView } from '@/components/TrackJobView'
 import { Header, Footer, JobCard, NewsletterSignup, ApplyButton, ShareButton } from '@/components'
 import { formatSalary, formatDate, timeAgo, parseDate } from '@/lib/utils'
 import { renderDescription, safeJsonLd } from '@/lib/description'
+import { buildJobPostingJsonLd } from '@/lib/job-posting'
 
 export const dynamic = 'force-dynamic'
 
@@ -74,53 +75,11 @@ export async function generateMetadata({ params }: JobPageProps): Promise<Metada
 
 function JobPostingJsonLd({ job }: { job: NonNullable<Awaited<ReturnType<typeof getJob>>> }) {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-  
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'JobPosting',
-    title: job.title,
-    description: job.description,
-    identifier: {
-      '@type': 'PropertyValue',
-      name: job.companyName,
-      value: job.slug,
-    },
-    datePosted: parseDate(job.createdAt)?.toISOString(),
-    validThrough: job.expiresAt,
-    employmentType: job.locationType === 'Remote' ? 'FULL_TIME' : 'FULL_TIME',
-    hiringOrganization: {
-      '@type': 'Organization',
-      name: job.companyName,
-      sameAs: job.companyWebsite,
-    },
-    jobLocation: {
-      '@type': 'Place',
-      address: {
-        '@type': 'PostalAddress',
-        addressLocality: job.location,
-        addressRegion: job.region,
-      },
-    },
-    jobLocationType: job.locationType === 'Remote' ? 'TELECOMMUTE' : undefined,
-    baseSalary: job.salaryMin || job.salaryMax ? {
-      '@type': 'MonetaryAmount',
-      currency: job.salaryCurrency || 'EUR',
-      value: {
-        '@type': 'QuantitativeValue',
-        minValue: job.salaryMin,
-        maxValue: job.salaryMax,
-        unitText: 'YEAR',
-      },
-    } : undefined,
-    industry: job.industry,
-    directApply: true,
-    url: `${baseUrl}/jobs/${job.slug}`,
-  }
-  
+
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }}
+      dangerouslySetInnerHTML={{ __html: safeJsonLd(buildJobPostingJsonLd(job, baseUrl)) }}
     />
   )
 }
