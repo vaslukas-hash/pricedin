@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { db } from '@/lib/db'
 import { jobs } from '@/lib/db/schema'
 import { eq, and, ne, desc } from 'drizzle-orm'
+import { TrackJobView } from '@/components/TrackJobView'
 import { Header, Footer, JobCard, NewsletterSignup, ApplyButton, ShareButton } from '@/components'
 import { formatSalary, formatDate, timeAgo, parseDate } from '@/lib/utils'
 import { renderDescription, safeJsonLd } from '@/lib/description'
@@ -144,6 +145,7 @@ export default async function JobPage({ params }: JobPageProps) {
       <Header />
       
       <main className="flex-1 py-8">
+        <TrackJobView jobId={job.id} company={job.companyName} />
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           {/* Breadcrumb */}
           <nav className="mb-6">
@@ -226,7 +228,7 @@ export default async function JobPage({ params }: JobPageProps) {
             
             {/* CTA */}
             <div className="mt-6 pt-6 border-t border-brand-100 flex flex-col sm:flex-row gap-4">
-              <ApplyButton jobId={job.id} applyUrl={job.applyUrl} />
+              <ApplyButton jobId={job.id} applyUrl={job.applyUrl} company={job.companyName} />
               <ShareButton title={job.title} />
             </div>
           </div>
@@ -246,7 +248,7 @@ export default async function JobPage({ params }: JobPageProps) {
             <p className="text-brand-600 mb-4">
               Apply now on {job.companyName}&apos;s website. Great pricing roles fill fast.
             </p>
-            <ApplyButton jobId={job.id} applyUrl={job.applyUrl} />
+            <ApplyButton jobId={job.id} applyUrl={job.applyUrl} company={job.companyName} />
           </div>
           
           {/* Similar Jobs */}
