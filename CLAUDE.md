@@ -66,8 +66,23 @@ Design tokens live in `tailwind.config.ts`: `brand-*` (neutral slate) and `accen
 2. Small, focused commits with descriptive messages (what and why), not "Update X".
 3. Before opening a PR: `npm run typecheck`, `npm test` and `npm run build` pass, and the change was checked in the browser. Wait for the CI check to be green before merging.
 4. Open a PR with `gh pr create`; Vercel posts a preview URL. The owner reviews and merges.
-5. For changes touching the DB schema, auth, or more than ~3 files, outline the plan and get approval before coding.
+5. For changes touching the DB schema, auth, or more than ~3 files, outline the plan and get approval before coding. Also ask before adding new dependencies or anything with recurring cost (budget cap: €50/month).
 6. Tasks come from GitHub Issues (`gh issue list`). Reference the issue in the PR (`Closes #n`).
+7. Read `docs/BACKLOG.md` (priority list) and `docs/ROADMAP.md` (context) before starting. Work one ticket at a time; keep changes small and reviewable. Backlog items should reference their issue number.
+8. After each task: mark it done in `docs/BACKLOG.md` and summarise what shipped in 3-5 lines. The owner is not a developer, so explain changes in plain language.
+9. API keys go in Vercel env vars, never in the repo.
+
+## Product priorities
+
+1. SEO and indexing (Search Console, sitemap, metadata, structured data like JobPosting schema)
+2. Analytics (Google Analytics)
+3. Content infrastructure: blog, salary pages from existing listings, category/location landing pages
+4. Newsletter signup (Buttondown)
+5. Job aggregation: SerpAPI for discovery + Claude API for classification
+
+## Quality bar
+
+Listings should be curated and credible: no duplicates, no spammy roles, accurate salary data.
 
 ## Known issues
 
